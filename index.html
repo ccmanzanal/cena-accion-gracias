@@ -36,7 +36,22 @@
             flex-direction: column;
             justify-content: center;
             position: relative;
-            z-index: 2;
+            z-index: 5;
+        }
+
+        .slide-step {
+            display: none;
+            position: relative;
+            z-index: 5;
+        }
+
+        .slide-step.active {
+            display: block;
+            animation: vipSlideNext 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        .slide-step.prev-anim {
+            animation: vipSlidePrev 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
         }
 
         .slide-step {
@@ -599,6 +614,63 @@
             flex-direction: column;
             align-items: center;
             gap: 8px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .enter-hint {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .enter-hint kbd {
+            background: #ffffff;
+            border: 1px solid rgba(212, 175, 55, 0.55);
+            border-radius: 6px;
+            padding: 2px 7px;
+            font-size: 0.74rem;
+            font-weight: 800;
+            color: var(--bordo-primary);
+        }
+
+        .live-calc-pill {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(212, 175, 55, 0.16);
+            border: 1.5px solid var(--gold-primary);
+            border-radius: 14px;
+            padding: 10px 14px;
+            margin-bottom: 12px;
+            font-size: 0.86rem;
+            font-weight: 800;
+            color: var(--bordo-primary);
+        }
+
+        .toast-banner {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-160%);
+            background: #991b1b;
+            color: #ffffff;
+            border: 1.5px solid var(--gold-primary);
+            padding: 13px 22px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+            z-index: 200;
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            max-width: 92vw;
+        }
+
+        .toast-banner.show {
+            transform: translateX(-50%) translateY(0);
         }
 
         .btn-next {
