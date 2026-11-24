@@ -1531,51 +1531,56 @@
             submitBtn.disabled = true;
             submitBtn.innerHTML = `<span class="spinner"></span> Generando tu cupón...`;
 
-            try {
-                if (GOOGLE_SHEETS_WEBHOOK_URL) {
-                    await fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    });
-                }
-            } catch (err) {
-                console.error('Error al enviar:', err);
-            } finally {
+            // Enviar los datos a Google Sheets en segundo plano sin congelar la pantalla
+            if (GOOGLE_SHEETS_WEBHOOK_URL) {
+                fetch(GOOGLE_SHEETS_WEBHOOK_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    keepalive: true,
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify(payload)
+                }).catch(err => console.error('Error al enviar a Google Sheets:', err));
+            }
+
+            // Mostrar el cupón digital VIP inmediatamente
+            setTimeout(() => {
                 submitBtn.disabled = false;
                 submitBtn.innerHTML = `Confirmar Asistencia <i class="fa-solid fa-champagne-glasses"></i>`;
                 showConfirmation(payload);
-            }
+            }, 350);
         }
 
         function showConfirmation(data) {
             lastConfirmedData = data;
-            document.getElementById('couponCodeDisplay').innerText = `#${data.codigoCupon}`;
-            document.getElementById('stubSerialCode').innerText = `${data.codigoCupon} · VIP`;
-            document.getElementById('couponHolderName').innerText = data.nombre;
-            document.getElementById('couponTotalAmount').innerText = `$${data.totalMonto.toLocaleString('es-CL')} (${data.totalCupos} cupo${data.totalCupos > 1 ? 's' : ''})`;
+            try {
+                document.getElementById('couponCodeDisplay').innerText = `#${data.codigoCupon}`;
+                document.getElementById('stubSerialCode').innerText = `${data.codigoCupon} · VIP`;
+                document.getElementById('couponHolderName').innerText = data.nombre;
+                document.getElementById('couponTotalAmount').innerText = `$${data.totalMonto.toLocaleString('es-CL')} (${data.totalCupos} cupo${data.totalCupos > 1 ? 's' : ''})`;
 
-            let listaTxt = `Titular: ${data.nombre}`;
-            if (data.enGrupo === 'Sí' && formState.acompanantes.length > 0) {
-                const nombresAcomp = formState.acompanantes.map(f => f.nombre.trim()).join(', ');
-                listaTxt += ` + ${nombresAcomp}`;
-            }
-            document.getElementById('couponGuestsList').innerText = listaTxt;
+                let listaTxt = `Titular: ${data.nombre}`;
+                if (data.enGrupo === 'Sí' && formState.acompanantes.length > 0) {
+                    const nombresAcomp = formState.acompanantes.map(f => f.nombre.trim()).join(', ');
+                    listaTxt += ` + ${nombresAcomp}`;
+                }
+                document.getElementById('couponGuestsList').innerText = listaTxt;
 
-            // Generar QR real en el talón dorado
-            const qrContainer = document.getElementById('couponQrBox');
-            qrContainer.innerHTML = '';
-            const qrPayload = `CENA-AG2026|${data.codigoCupon}|${data.nombre}|CUPOS:${data.totalCupos}|TOTAL:$${data.totalMonto}`;
-            if (typeof QRCode !== 'undefined') {
-                new QRCode(qrContainer, {
-                    text: qrPayload,
-                    width: 76,
-                    height: 76,
-                    colorDark: '#2b040d',
-                    colorLight: '#ffffff',
-                    correctLevel: QRCode.CorrectLevel.M
-                });
+                // Generar QR real en el talón dorado
+                const qrContainer = document.getElementById('couponQrBox');
+                qrContainer.innerHTML = '';
+                const qrPayload = `CENA-AG2026|${data.codigoCupon}|${data.nombre}|CUPOS:${data.totalCupos}|TOTAL:$${data.totalMonto}`;
+                if (typeof QRCode !== 'undefined') {
+                    new QRCode(qrContainer, {
+                        text: qrPayload,
+                        width: 76,
+                        height: 76,
+                        colorDark: '#2b040d',
+                        colorLight: '#ffffff',
+                        correctLevel: QRCode.CorrectLevel.M
+                    });
+                }
+            } catch (err) {
+                console.error('Error renderizando datos del cupón:', err);
             }
 
             goToSlide(6, 'next');
