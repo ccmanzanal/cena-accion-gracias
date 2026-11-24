@@ -1057,9 +1057,167 @@
         .primary-gold .hero-action-sub {
             color: rgba(36, 4, 11, 0.82);
         }
+
+        /* Pantalla de Bloqueo PIN de Gala */
+        .pin-lock-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top center, #5e0b1f 0%, #2a040d 65%, #160206 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .pin-lock-overlay.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .pin-lock-card {
+            background: var(--cream-bg);
+            border: 2.5px solid var(--gold-primary);
+            border-radius: 28px;
+            padding: 28px 24px;
+            max-width: 370px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 28px 64px rgba(0, 0, 0, 0.65), 0 0 32px rgba(212, 175, 55, 0.25);
+        }
+
+        .pin-dots-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 18px 0 12px;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--bordo-primary);
+            background: transparent;
+            transition: all 0.18s ease;
+        }
+
+        .pin-dot.filled {
+            background: var(--bordo-primary);
+            box-shadow: 0 0 10px rgba(94, 11, 31, 0.45);
+            transform: scale(1.12);
+        }
+
+        .pin-dot.error {
+            border-color: #dc2626;
+            background: #dc2626;
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .pin-key-btn {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 14px 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--bordo-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(61, 8, 20, 0.06);
+        }
+
+        .pin-key-btn:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-dark);
+        }
+
+        .pin-key-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Modal Registro Presencial en Puerta */
+        .walkin-modal-box {
+            background: var(--cream-bg);
+            border: 2.5px solid var(--gold-primary);
+            border-radius: 26px;
+            padding: 24px;
+            max-width: 470px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
+            text-align: left;
+        }
+
+        .walkin-input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-gold);
+            background: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .walkin-input:focus {
+            border-color: var(--bordo-primary);
+        }
+
+        .btn-torch-active {
+            background: #fef08a !important;
+            color: #854d0e !important;
+            border-color: #eab308 !important;
+        }
     </style>
 </head>
 <body>
+
+    <!-- Pantalla de Bloqueo con PIN -->
+    <div id="pinLockOverlay" class="pin-lock-overlay">
+        <div class="pin-lock-card">
+            <div style="width:62px; height:62px; border-radius:50%; background:rgba(212,175,55,0.18); border:2px solid var(--gold-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:var(--bordo-primary); font-size:1.45rem;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div style="font-size:0.72rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-dark); text-transform:uppercase;">Acceso Equipo Gala</div>
+            <h2 style="font-family:'Cinzel Decorative', serif; font-size:1.3rem; font-weight:900; color:var(--bordo-primary); margin-top:4px;">PIN de Seguridad</h2>
+            <p style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-top:4px;">Ingresa el código de 4 dígitos para administrar recepción y pagos.</p>
+
+            <div class="pin-dots-row" id="pinDotsRow">
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+            </div>
+            <div id="pinErrorMsg" style="min-height:18px; font-size:0.78rem; font-weight:800; color:#dc2626;"></div>
+
+            <div class="pin-keypad">
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('1')">1</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('2')">2</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('3')">3</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('4')">4</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('5')">5</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('6')">6</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('7')">7</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('8')">8</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('9')">9</button>
+                <button type="button" class="pin-key-btn" style="font-size:0.9rem; color:var(--text-muted);" onclick="limpiarPin()">Limpiar</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('0')">0</button>
+                <button type="button" class="pin-key-btn" onclick="borrarDigitoPin()"><i class="fa-solid fa-delete-left"></i></button>
+            </div>
+            <div style="font-size:0.72rem; color:var(--text-muted); margin-top:14px;">PIN por defecto: <strong>2026</strong></div>
+        </div>
+    </div>
 
     <div class="gala-ambient"></div>
 
@@ -1086,9 +1244,13 @@
             </div>
 
             <div class="actions" id="mainHeaderActions">
+                <button class="btn btn-gala" onclick="abrirModalWalkin()"><i class="fa-solid fa-user-plus"></i> + Invitado en Puerta</button>
                 <button class="btn" onclick="cargarDatos(false)"><i class="fa-solid fa-rotate"></i> Actualizar</button>
                 <button class="btn btn-icon-only" onclick="exportarExcel()" title="Descargar Excel" aria-label="Descargar Excel">
                     <i class="fa-solid fa-file-excel"></i>
+                </button>
+                <button class="btn" onclick="bloquearDashboard()" title="Bloquear pantalla con PIN" aria-label="Bloquear pantalla">
+                    <i class="fa-solid fa-lock"></i>
                 </button>
             </div>
         </header>
@@ -1244,15 +1406,13 @@
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
                     <div>
                         <h2 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.35rem; font-weight:900;">
-                            <i class="fa-solid fa-coins" style="color:var(--gold-dark);"></i> Control de Pagos por Reserva / Mesa
+                            <i class="fa-solid fa-coins" style="color:var(--gold-dark);"></i> Control de Pagos por Mesa
                         </h2>
                         <p style="font-size:0.86rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
-                            Tarifa general: <strong>$5.000</strong> · Niños 5 a 12 años: <strong>$3.000</strong> · Hasta 4 años: <strong>Gratis</strong>.
+                            Tarifa general: <strong>$5.000</strong> · Niños 5-12 años: <strong>$3.000</strong> · Hasta 4 años: <strong>Gratis</strong>.
                         </p>
                     </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
-                    </div>
+                    <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
                 </div>
 
                 <div class="pay-summary-strip">
@@ -1283,12 +1443,12 @@
                 <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
                     <div class="search-box" style="flex:1; min-width:220px;">
                         <i class="fa-solid fa-magnifying-glass"></i>
-                        <input type="text" id="paySearchInput" placeholder="Buscar por titular, invitado o código #AG-..." oninput="renderVistaPagos()">
+                        <input type="text" id="paySearchInput" placeholder="Buscar por titular, código #AG- o integrante..." oninput="renderVistaPagos()">
                     </div>
                     <div class="view-tabs">
                         <button class="tab-btn active" id="payFilterTodos" onclick="setPayFilter('todos')">Todas las Mesas</button>
                         <button class="tab-btn" id="payFilterPendientes" onclick="setPayFilter('pendientes')">Con Saldo Pendiente</button>
-                        <button class="tab-btn" id="payFilterPagados" onclick="setPayFilter('pagados')">Pagadas ✓</button>
+                        <button class="tab-btn" id="payFilterPagados" onclick="setPayFilter('pagados')">Mesa Pagada ✓</button>
                     </div>
                 </div>
             </div>
@@ -1305,17 +1465,15 @@
                             <i class="fa-solid fa-chart-pie" style="color:var(--gold-dark);"></i> Balance General y Estadísticas
                         </h2>
                         <p style="font-size:0.86rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
-                            Resumen financiero, distribución por edad y compromiso de ensaladas para rendición de cuentas.
+                            Resumen financiero y distribución para cuenta pública y organización.
                         </p>
                     </div>
-                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
-                        <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
-                    </div>
+                    <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
                 </div>
 
                 <div class="pay-summary-strip">
                     <div class="pay-stat-box">
-                        <div class="pay-stat-label">Total Asistentes Activos</div>
+                        <div class="pay-stat-label">Asistentes Activos</div>
                         <div class="pay-stat-num" id="balTotalAsistentes" style="color:var(--bordo-primary);">0</div>
                     </div>
                     <div class="pay-stat-box">
@@ -1327,33 +1485,27 @@
                         <div class="pay-stat-num" id="balTotalPendiente" style="color:#b45309;">$0</div>
                     </div>
                     <div class="pay-stat-box">
-                        <div class="pay-stat-label">Ensaladas Comprometidas</div>
-                        <div class="pay-stat-num" id="balTotalEnsaladas" style="color:var(--gold-dark);">0</div>
+                        <div class="pay-stat-label">Mesas con Ensalada</div>
+                        <div class="pay-stat-num" id="balTotalEnsaladas" style="color:var(--gold-dark);">0 de 0</div>
                     </div>
                 </div>
             </div>
 
             <div class="charts-grid">
                 <div class="chart-card">
-                    <h3><i class="fa-solid fa-chart-pie" style="color: var(--gold-dark);"></i> Distribución por Tarifa</h3>
-                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Clic en un segmento para ver los invitados</div>
-                    <div class="chart-wrapper">
-                        <canvas id="chartTramos"></canvas>
-                    </div>
+                    <h3><i class="fa-solid fa-chart-pie" style="color:var(--gold-dark);"></i> Tramos de Adhesión</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar invitados</div>
+                    <div class="chart-wrapper"><canvas id="chartTramos"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h3><i class="fa-solid fa-coins" style="color: #15803d;"></i> Estado de Adhesiones</h3>
-                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Clic en un segmento para filtrar</div>
-                    <div class="chart-wrapper">
-                        <canvas id="chartPagos"></canvas>
-                    </div>
+                    <h3><i class="fa-solid fa-coins" style="color:#15803d;"></i> Estado de Recaudación</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar invitados</div>
+                    <div class="chart-wrapper"><canvas id="chartPagos"></canvas></div>
                 </div>
                 <div class="chart-card">
-                    <h3><i class="fa-solid fa-bowl-food" style="color: var(--bordo-primary);"></i> Mesas con Ensalada</h3>
-                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Clic en un segmento para ver las ensaladas</div>
-                    <div class="chart-wrapper">
-                        <canvas id="chartEnsaladas"></canvas>
-                    </div>
+                    <h3><i class="fa-solid fa-bowl-food" style="color:var(--bordo-primary);"></i> Ensaladas Comprometidas</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar mesas</div>
+                    <div class="chart-wrapper"><canvas id="chartEnsaladas"></canvas></div>
                 </div>
             </div>
         </div>
@@ -1364,7 +1516,7 @@
         <div class="person-drawer-panel" onclick="event.stopPropagation()">
             <div style="display:flex; justify-content:space-between; align-items:center;">
                 <span style="font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--gold-dark);">
-                    <i class="fa-solid fa-crown"></i> Ficha de Invitado Gala
+                    <i class="fa-solid fa-id-card"></i> Ficha de Invitado
                 </span>
                 <button class="btn" style="padding:6px 12px; font-size:0.82rem;" onclick="cerrarFichaPersona()">
                     <i class="fa-solid fa-xmark"></i> Cerrar
@@ -1374,31 +1526,36 @@
         </div>
     </div>
 
-    <!-- Modal de confirmación -->
+    <!-- Modal de confirmación para reiniciar recepción -->
     <div id="confirmModal" class="modal-backdrop">
         <div class="modal-box">
-            <i class="fa-solid fa-triangle-exclamation" style="font-size: 2.5rem; color: #dc2626; margin-bottom: 10px;"></i>
-            <h3 style="font-family: 'Cormorant Garamond', serif; color: var(--bordo-primary); font-size: 1.45rem; font-weight: 700;">¿Reiniciar registro de puerta?</h3>
-            <p style="font-size: 0.9rem; color: var(--text-muted); margin: 8px 0 20px;">Se desmarcarán todos los invitados registrados en la recepción.</p>
-            <div style="display: flex; gap: 10px; justify-content: center;">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:2.4rem; color:#dc2626; margin-bottom:10px;"></i>
+            <h3 style="font-family:'Cormorant Garamond', serif; color:var(--bordo-primary); font-size:1.4rem; font-weight:700;">¿Reiniciar registro de puerta?</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin:8px 0 20px;">Se desmarcarán todos los invitados ingresados al salón.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
                 <button class="btn" onclick="cerrarModalReset()">Cancelar</button>
                 <button class="btn btn-danger" onclick="confirmarResetCheckin()">Sí, reiniciar</button>
             </div>
         </div>
     </div>
 
-    <!-- Modal Escáner QR en Vivo -->
+    <!-- Modal Escáner QR de Gala -->
     <div id="qrScannerModal" class="modal-backdrop" onclick="cerrarEscanerQR(event)">
         <div class="qr-modal-box" onclick="event.stopPropagation()">
-            <div style="display:flex; justify-content:space-between; align-items:center;">
-                <h3 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.1rem; font-weight:900;">
-                    <i class="fa-solid fa-qrcode" style="color:var(--gold-dark);"></i> Lector de Pase VIP
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <h3 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.05rem; font-weight:900;">
+                    <i class="fa-solid fa-qrcode" style="color:var(--gold-dark);"></i> Portería Rápida QR
                 </h3>
-                <button class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="cerrarEscanerQR()">
-                    <i class="fa-solid fa-xmark"></i> Cerrar
-                </button>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" id="btnToggleTorch" class="btn" style="padding:6px 11px; font-size:0.78rem; display:none;" onclick="toggleLinternaQR()">
+                        <i class="fa-solid fa-bolt"></i> Luz
+                    </button>
+                    <button type="button" class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="cerrarEscanerQR()">
+                        <i class="fa-solid fa-xmark"></i> Cerrar
+                    </button>
+                </div>
             </div>
-            <p style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-top:4px;">
+            <p style="font-size:0.8rem; color:var(--text-muted); font-weight:600; margin-top:4px;">
                 Apunta la cámara al código QR del talón dorado del ticket.
             </p>
 
@@ -1414,13 +1571,155 @@
         </div>
     </div>
 
+    <!-- Modal Registro Presencial en Puerta (Walk-in) -->
+    <div id="walkinModal" class="modal-backdrop" onclick="cerrarModalWalkin(event)">
+        <div class="walkin-modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.15rem; font-weight:900;">
+                    <i class="fa-solid fa-user-plus" style="color:var(--gold-dark);"></i> Registro en Puerta
+                </h3>
+                <button type="button" class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="cerrarModalWalkin()">
+                    <i class="fa-solid fa-xmark"></i> Cerrar
+                </button>
+            </div>
+            <p style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-bottom:14px;">
+                Inscribe al instante a invitados que llegan sin formulario previo.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div>
+                    <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">Nombre Completo Titular *</label>
+                    <input type="text" id="walkinNombre" class="walkin-input" placeholder="Ej: Roberto Muñoz">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div>
+                        <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">WhatsApp (opcional)</label>
+                        <input type="tel" id="walkinTelefono" class="walkin-input" placeholder="+56 9 ...">
+                    </div>
+                    <div>
+                        <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">Ensalada (opcional)</label>
+                        <input type="text" id="walkinEnsalada" class="walkin-input" placeholder="Ej: Chilena">
+                    </div>
+                </div>
+
+                <!-- Acompañantes en puerta -->
+                <div style="background:#ffffff; border:1.5px solid var(--border-gold); border-radius:16px; padding:12px; margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:0.8rem; font-weight:800; color:var(--bordo-primary);">Acompañantes en esta mesa</span>
+                        <button type="button" class="btn btn-gold" style="padding:5px 10px; font-size:0.76rem;" onclick="agregarAcompWalkin()">
+                            <i class="fa-solid fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                    <div id="walkinAcompList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(212,175,55,0.18); border:1.5px solid var(--gold-primary); border-radius:14px; padding:10px 14px; font-weight:800; color:var(--bordo-primary); font-size:0.88rem;">
+                    <span id="walkinResumenCupos">Total: 1 persona (Titular)</span>
+                    <span id="walkinResumenMonto">$5.000</span>
+                </div>
+
+                <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:2px;">
+                    <label style="display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:800; color:#15803d; cursor:pointer;">
+                        <input type="checkbox" id="walkinMarcarPagado" checked style="width:17px; height:17px; accent-color:#15803d;">
+                        Marcar Pagado en caja
+                    </label>
+                    <label style="display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:800; color:var(--bordo-primary); cursor:pointer;">
+                        <input type="checkbox" id="walkinMarcarIngreso" checked style="width:17px; height:17px; accent-color:#5e0b1f;">
+                        Ingresar al salón ahora
+                    </label>
+                </div>
+
+                <button type="button" id="btnGuardarWalkin" class="btn btn-gala" style="width:100%; padding:13px; font-size:0.95rem; margin-top:4px;" onclick="guardarRegistroEnPuerta()">
+                    <i class="fa-solid fa-check-circle"></i> Registrar e Ingresar
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // URL oficial de Google Apps Script conectada a la hoja de cálculo
         const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzy3O0Sz3z0-CLFOUQr_oRgbEotyrLxK04BivdYhqyzp0DM4W5VrwWHabmp19s-sw/exec';
+        const DASHBOARD_PIN = '2026';
+        const PIN_SESSION_KEY = 'cena2026_pin_unlocked';
+
+        // ==================== SEGURIDAD PIN DE ACCESO ====================
+        let currentPinBuffer = '';
+
+        function verificarEstadoPinInicial() {
+            try {
+                if (sessionStorage.getItem(PIN_SESSION_KEY) === 'true') {
+                    document.getElementById('pinLockOverlay').classList.add('unlocked');
+                }
+            } catch (e) {}
+        }
+
+        function actualizarPuntosPin(esError = false) {
+            const dots = document.querySelectorAll('#pinDotsRow .pin-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.remove('filled', 'error');
+                if (esError) dot.classList.add('error');
+                else if (idx < currentPinBuffer.length) dot.classList.add('filled');
+            });
+        }
+
+        function ingresarDigitoPin(digito) {
+            if (currentPinBuffer.length >= 4) return;
+            document.getElementById('pinErrorMsg').innerText = '';
+            currentPinBuffer += digito;
+            actualizarPuntosPin(false);
+
+            if (currentPinBuffer.length === 4) {
+                if (currentPinBuffer === DASHBOARD_PIN) {
+                    try { sessionStorage.setItem(PIN_SESSION_KEY, 'true'); } catch (e) {}
+                    setTimeout(() => {
+                        document.getElementById('pinLockOverlay').classList.add('unlocked');
+                        currentPinBuffer = '';
+                        actualizarPuntosPin(false);
+                    }, 150);
+                } else {
+                    actualizarPuntosPin(true);
+                    document.getElementById('pinErrorMsg').innerText = 'PIN incorrecto. Intenta nuevamente.';
+                    setTimeout(() => {
+                        currentPinBuffer = '';
+                        actualizarPuntosPin(false);
+                    }, 650);
+                }
+            }
+        }
+
+        function borrarDigitoPin() {
+            currentPinBuffer = currentPinBuffer.slice(0, -1);
+            document.getElementById('pinErrorMsg').innerText = '';
+            actualizarPuntosPin(false);
+        }
+
+        function limpiarPin() {
+            currentPinBuffer = '';
+            document.getElementById('pinErrorMsg').innerText = '';
+            actualizarPuntosPin(false);
+        }
+
+        function bloquearDashboard() {
+            try { sessionStorage.removeItem(PIN_SESSION_KEY); } catch (e) {}
+            currentPinBuffer = '';
+            actualizarPuntosPin(false);
+            document.getElementById('pinLockOverlay').classList.remove('unlocked');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('pinLockOverlay');
+            if (!overlay || overlay.classList.contains('unlocked')) return;
+            if (/^[0-9]$/.test(e.key)) {
+                ingresarDigitoPin(e.key);
+            } else if (e.key === 'Backspace') {
+                borrarDigitoPin();
+            }
+        });
+
+        verificarEstadoPinInicial();
 
         const VALOR_ADULTO = 5000;
         const VALOR_NINO = 3000;
-
         const CHECKIN_STORAGE_KEY = 'cena2026_checkin_v1';
         const PAYMENT_STORAGE_KEY = 'cena2026_pagos_v1';
         const NO_ATTEND_STORAGE_KEY = 'cena2026_no_asiste_v1';
@@ -1442,7 +1741,11 @@
             checkinMap = JSON.parse(localStorage.getItem(CHECKIN_STORAGE_KEY) || '{}');
             paymentMap = JSON.parse(localStorage.getItem(PAYMENT_STORAGE_KEY) || '{}');
             noAttendMap = JSON.parse(localStorage.getItem(NO_ATTEND_STORAGE_KEY) || '{}');
-        } catch (e) {}
+        } catch (e) {
+            checkinMap = {};
+            paymentMap = {};
+            noAttendMap = {};
+        }
 
         let chartTramosInst = null;
         let chartPagosInst = null;
@@ -1452,18 +1755,10 @@
             return '$' + Number(monto || 0).toLocaleString('es-CL');
         }
 
-        function calcularTarifaPorEdad(edad) {
-            if (edad === null || edad === undefined || edad === '') return VALOR_ADULTO;
-            const e = Number(edad);
-            if (isNaN(e)) return VALOR_ADULTO;
-            if (e <= 4) return 0;
-            if (e <= 12) return VALOR_NINO;
-            return VALOR_ADULTO;
-        }
-
         function mostrarEstado(texto, esError = false) {
             const banner = document.getElementById('statusBanner');
             const span = document.getElementById('statusText');
+            if (!banner || !span) return;
             banner.classList.remove('hidden', 'error');
             if (esError) banner.classList.add('error');
             span.innerText = texto;
@@ -1478,15 +1773,15 @@
             if (estado === 'syncing') {
                 badge.style.background = '#fef3c7';
                 badge.style.color = '#92400e';
-                badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-fade"></i> ${texto}`;
+                badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-fade"></i> ${texto || 'Sincronizando...'}`;
             } else if (estado === 'ok') {
                 badge.style.background = '#dcfce7';
                 badge.style.color = '#15803d';
-                badge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${texto}`;
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${texto || 'Nube sincronizada ✓'}`;
             } else {
                 badge.style.background = 'rgba(212,175,55,0.22)';
                 badge.style.color = 'var(--bordo-primary)';
-                badge.innerHTML = `<i class="fa-solid fa-desktop"></i> ${texto}`;
+                badge.innerHTML = `<i class="fa-solid fa-cloud"></i> ${texto || 'Modo local'}`;
             }
         }
 
@@ -1504,13 +1799,26 @@
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'sync_estados', updates })
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'sync_estados',
+                        updates: updates
+                    })
                 });
                 setTimeout(() => setCloudSyncStatus('ok', 'Nube sincronizada ✓'), 500);
             } catch (err) {
+                console.error('Error sincronizando con Google Sheets:', err);
                 setCloudSyncStatus('local', 'Guardado local');
             }
+        }
+
+        function calcularTarifaPorEdad(edad) {
+            if (edad === null || edad === undefined || edad === '') return VALOR_ADULTO;
+            const e = Number(edad);
+            if (isNaN(e)) return VALOR_ADULTO;
+            if (e <= 4) return 0;
+            if (e <= 12) return VALOR_NINO;
+            return VALOR_ADULTO;
         }
 
         function esNoAsiste(stableKey) {
@@ -1525,7 +1833,7 @@
                 const parenIdx = parte.indexOf('(');
                 if (parenIdx !== -1) {
                     nombre = parte.substring(0, parenIdx).trim();
-                    const detalle = parte.substring(parenIdx + 1);
+                    const detalle = parte.substring(parenIdx + 1, parte.lastIndexOf(')') !== -1 ? parte.lastIndexOf(')') : parte.length);
                     const edadMatch = detalle.match(/(\d+)\s*años/i);
                     if (edadMatch) edad = Number(edadMatch[1]);
                 }
@@ -1533,12 +1841,12 @@
             });
         }
 
-        function crearWhatsappLink(telefono, nombre, codigoCupon) {
+        function crearWhatsappLink(telefono, nombre, cupon) {
             if (!telefono) return '<span style="color:#94a3b8;">Sin teléfono</span>';
             let limpio = String(telefono).replace(/\D/g, '');
             if (limpio.length === 9 && limpio.startsWith('9')) limpio = '56' + limpio;
             else if (limpio.length === 8) limpio = '569' + limpio;
-            const texto = encodeURIComponent(`Hola ${nombre}, te escribimos por tu reserva (${codigoCupon}) para la Cena de Acción de Gracias 2026 `);
+            const texto = encodeURIComponent(`Hola ${nombre}, te escribimos por tu reserva #${cupon} de la Cena de Acción de Gracias 2026: `);
             return `<a href="https://wa.me/${limpio}?text=${texto}" target="_blank" rel="noopener" class="wa-link" onclick="event.stopPropagation()">
                         <i class="fa-brands fa-whatsapp"></i> ${telefono}
                     </a>`;
@@ -1549,10 +1857,10 @@
                 localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkinMap));
             } catch (e) {}
             actualizarKPIs();
-            renderVistaRecepcion();
             renderTabla();
+            renderVistaRecepcion();
             if (selectedPersonKey) renderFichaPersona();
-            if (changedKeys.length) sincronizarEstadosEnNube(changedKeys);
+            if (changedKeys.length > 0) sincronizarEstadosEnNube(changedKeys);
         }
 
         function guardarPagos(changedKeys = []) {
@@ -1563,8 +1871,9 @@
             actualizarKPIs();
             renderTabla();
             renderVistaPagos();
+            renderVistaRecepcion();
             if (selectedPersonKey) renderFichaPersona();
-            if (changedKeys.length) sincronizarEstadosEnNube(changedKeys);
+            if (changedKeys.length > 0) sincronizarEstadosEnNube(changedKeys);
         }
 
         function togglePagoVerificado(personKey) {
@@ -1580,8 +1889,16 @@
             } else {
                 noAttendMap[personKey] = true;
                 delete paymentMap[personKey];
+                delete checkinMap[personKey];
             }
             guardarPagos([personKey]);
+        }
+
+        function toggleIngresoPuerta(personKey) {
+            if (noAttendMap[personKey]) return;
+            if (checkinMap[personKey]) delete checkinMap[personKey];
+            else checkinMap[personKey] = true;
+            guardarCheckin([personKey]);
         }
 
         function marcarFamiliaCompleta(groupId, marcarComoPagado) {
@@ -1589,7 +1906,7 @@
             if (!grupo) return;
             const keys = [];
             grupo.miembros.forEach(m => {
-                if (m.valor === 0 || noAttendMap[m.stableKey]) return;
+                if (m.valor <= 0 || noAttendMap[m.stableKey]) return;
                 if (marcarComoPagado) paymentMap[m.stableKey] = true;
                 else delete paymentMap[m.stableKey];
                 keys.push(m.stableKey);
@@ -1600,12 +1917,6 @@
         function toggleAcordeonFamilia(groupId) {
             expandedFamilies[groupId] = !expandedFamilies[groupId];
             renderVistaPagos();
-        }
-
-        function toggleIngresoPuerta(personKey) {
-            if (checkinMap[personKey]) delete checkinMap[personKey];
-            else checkinMap[personKey] = true;
-            guardarCheckin([personKey]);
         }
 
         function abrirVistaRecepcion() {
@@ -1658,17 +1969,33 @@
             renderVistaPagos();
         }
 
-        function abrirModalReset() { document.getElementById('confirmModal').classList.add('show'); }
-        function cerrarModalReset() { document.getElementById('confirmModal').classList.remove('show'); }
+        function abrirModalReset() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
 
-        // ==================== LECTOR QR CON CÁMARA ====================
+        function cerrarModalReset() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        // ==================== LECTOR QR CON CÁMARA (PORTERÍA RÁPIDA + ANTI-REBOTE) ====================
         let html5QrScanner = null;
         let qrScannerRunning = false;
+        let lastScannedCode = '';
+        let lastScanTimestamp = 0;
+        let qrTorchOn = false;
 
         async function abrirEscanerQR() {
             document.getElementById('qrScannerModal').classList.add('show');
             document.getElementById('qrScanResultArea').innerHTML = '';
             document.getElementById('manualQrCodeInput').value = '';
+            lastScannedCode = '';
+            qrTorchOn = false;
+
+            const torchBtn = document.getElementById('btnToggleTorch');
+            if (torchBtn) {
+                torchBtn.style.display = 'none';
+                torchBtn.classList.remove('btn-torch-active');
+            }
 
             if (typeof Html5Qrcode === 'undefined') {
                 document.getElementById('qrScanResultArea').innerHTML = `
@@ -1688,10 +2015,25 @@
                         { facingMode: 'environment' },
                         { fps: 10, qrbox: { width: 220, height: 220 } },
                         (decodedText) => {
+                            const ahora = Date.now();
+                            // Evitar lecturas repetidas y sonidos múltiples del mismo QR mientras está en pantalla
+                            if (decodedText === lastScannedCode && (ahora - lastScanTimestamp) < 4500) {
+                                return;
+                            }
+                            lastScannedCode = decodedText;
+                            lastScanTimestamp = ahora;
                             procesarTextoQR(decodedText);
                         },
                         () => {}
                     );
+
+                    // Mostrar botón de linterna si la cámara del teléfono lo soporta
+                    try {
+                        const caps = html5QrScanner.getRunningTrackCameraCapabilities();
+                        if (caps && caps.torchFeature && caps.torchFeature().isSupported() && torchBtn) {
+                            torchBtn.style.display = 'inline-flex';
+                        }
+                    } catch (e) {}
                 }
             } catch (err) {
                 qrScannerRunning = false;
@@ -1702,9 +2044,35 @@
             }
         }
 
+        async function toggleLinternaQR() {
+            if (!html5QrScanner || !qrScannerRunning) return;
+            try {
+                const caps = html5QrScanner.getRunningTrackCameraCapabilities();
+                if (caps && caps.torchFeature && caps.torchFeature().isSupported()) {
+                    qrTorchOn = !qrTorchOn;
+                    await caps.torchFeature().apply(qrTorchOn);
+                    const torchBtn = document.getElementById('btnToggleTorch');
+                    if (torchBtn) torchBtn.classList.toggle('btn-torch-active', qrTorchOn);
+                }
+            } catch (e) {}
+        }
+
+        function siguientePaseQR() {
+            lastScannedCode = '';
+            lastScanTimestamp = 0;
+            document.getElementById('manualQrCodeInput').value = '';
+            document.getElementById('qrScanResultArea').innerHTML = `
+                <div style="text-align:center; padding:12px; font-size:0.82rem; font-weight:700; color:var(--gold-dark);">
+                    <i class="fa-solid fa-camera"></i> Cámara lista para el siguiente ticket...
+                </div>
+            `;
+        }
+
         async function cerrarEscanerQR(event) {
             if (event && event.target !== document.getElementById('qrScannerModal')) return;
             document.getElementById('qrScannerModal').classList.remove('show');
+            lastScannedCode = '';
+            qrTorchOn = false;
             if (html5QrScanner && qrScannerRunning) {
                 try {
                     await html5QrScanner.stop();
@@ -1716,10 +2084,12 @@
         function buscarCodigoManualQR() {
             const val = document.getElementById('manualQrCodeInput').value.trim();
             if (!val) return;
+            lastScannedCode = val;
+            lastScanTimestamp = Date.now();
             procesarTextoQR(val);
         }
 
-        function procesarTextoQR(rawText) {
+        function procesarTextoQR(rawText, silencioso = false) {
             // Formato generado por el cupón: CENA-AG2026|AG-XXXX|Nombre|CUPOS:X|TOTAL:$XXXX
             let codigoBuscado = rawText.replace(/#/g, '').trim().toUpperCase();
             let nombreFallback = '';
@@ -1736,16 +2106,19 @@
                 codigoBuscado = 'AG-' + codigoBuscado;
             }
 
-            // Reproducir un leve sonido de confirmación
-            try {
-                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-                const osc = audioCtx.createOscillator();
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, audioCtx.currentTime);
-                osc.connect(audioCtx.destination);
-                osc.start();
-                osc.stop(audioCtx.currentTime + 0.12);
-            } catch (e) {}
+            // Reproducir un único bip y vibración breve solo cuando es una lectura nueva
+            if (!silencioso) {
+                try {
+                    if (navigator.vibrate) navigator.vibrate(90);
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    osc.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.12);
+                } catch (e) {}
+            }
 
             const grupo = gruposFamiliares.find(g => g.codigoCupon.replace(/#/g, '').trim().toUpperCase() === codigoBuscado);
             const resultArea = document.getElementById('qrScanResultArea');
@@ -1762,9 +2135,14 @@
                         <div style="font-size:0.78rem; color:var(--text-muted); margin-top:6px;">
                             Si aún no aparece en la tabla, actualiza la planilla para sincronizar los últimos registros.
                         </div>
-                        <button type="button" class="btn btn-gold" style="width:100%; margin-top:10px;" onclick="cargarDatos(false)">
-                            <i class="fa-solid fa-rotate"></i> Sincronizar planilla ahora
-                        </button>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                            <button type="button" class="btn btn-gold" onclick="cargarDatos(false)">
+                                <i class="fa-solid fa-rotate"></i> Sincronizar
+                            </button>
+                            <button type="button" class="btn" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
+                            </button>
+                        </div>
                     </div>
                 `;
                 return;
@@ -1775,7 +2153,7 @@
             const pagadoMesa = activos.filter(m => m.valor > 0 && paymentMap[m.stableKey]).reduce((s, m) => s + m.valor, 0);
             const pagadoCompleto = pagadoMesa >= totalMesa;
 
-            // Si es una sola persona, mantiene ingreso directo en un toque
+            // Si es una sola persona: ingreso directo + botón "Siguiente Pase" para portería rápida
             if (activos.length === 1) {
                 const unico = activos[0];
                 const yaIngreso = !!checkinMap[unico.stableKey];
@@ -1807,17 +2185,22 @@
                                     <i class="fa-solid fa-check-double"></i> Marcar Pagado
                                 </button>
                             ` : `
-                                <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="cerrarEscanerQR()">
-                                    Listo ✓
+                                <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="siguientePaseQR()">
+                                    <i class="fa-solid fa-forward"></i> Siguiente Pase
                                 </button>
                             `}
                         </div>
+                        ${!pagadoCompleto ? `
+                            <button type="button" class="btn" style="width:100%; margin-top:8px; padding:8px; font-size:0.8rem;" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
+                            </button>
+                        ` : ''}
                     </div>
                 `;
                 return;
             }
 
-            // Si hay más de 1 persona en la mesa, permite elegir exactamente quiénes llegaron
+            // Si hay más de 1 persona en la mesa: mantiene abierta la selección individual sin avanzar automático
             const listaInvitadosHTML = activos.map(m => {
                 const ing = !!checkinMap[m.stableKey];
                 const safeKey = m.stableKey.replace(/'/g, "\\'");
@@ -1873,11 +2256,16 @@
                                 <i class="fa-solid fa-check-double"></i> Marcar Pagado
                             </button>
                         ` : `
-                            <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="cerrarEscanerQR()">
-                                Listo ✓
+                            <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
                             </button>
                         `}
                     </div>
+                    ${!pagadoCompleto ? `
+                        <button type="button" class="btn" style="width:100%; margin-top:8px; padding:8px; font-size:0.8rem;" onclick="siguientePaseQR()">
+                            <i class="fa-solid fa-forward"></i> Siguiente Pase
+                        </button>
+                    ` : ''}
                 </div>
             `;
         }
@@ -1924,7 +2312,8 @@
             });
 
             guardarCheckin(changedKeys);
-            procesarTextoQR(grupo.codigoCupon);
+            // Mantiene abierta la tarjeta de grupo sin sonar de nuevo ni saltar de ticket
+            procesarTextoQR(grupo.codigoCupon, true);
         }
 
         function darIngresoMesaQR(groupId) {
@@ -1938,13 +2327,198 @@
                 }
             });
             guardarCheckin(keys);
-            procesarTextoQR(grupo.codigoCupon);
+            procesarTextoQR(grupo.codigoCupon, true);
         }
 
         function pagarMesaDesdeQR(groupId) {
             marcarFamiliaCompleta(groupId, true);
             const grupo = gruposFamiliares.find(g => g.groupId === groupId);
-            if (grupo) procesarTextoQR(grupo.codigoCupon);
+            if (grupo) procesarTextoQR(grupo.codigoCupon, true);
+        }
+
+        // ==================== REGISTRO PRESENCIAL EN PUERTA (WALK-IN) ====================
+        let walkinAcompanantes = [];
+
+        function abrirModalWalkin() {
+            walkinAcompanantes = [];
+            document.getElementById('walkinNombre').value = '';
+            document.getElementById('walkinTelefono').value = '';
+            document.getElementById('walkinEnsalada').value = '';
+            document.getElementById('walkinMarcarPagado').checked = true;
+            document.getElementById('walkinMarcarIngreso').checked = true;
+            renderWalkinAcompanantes();
+            document.getElementById('walkinModal').classList.add('show');
+            setTimeout(() => document.getElementById('walkinNombre').focus(), 100);
+        }
+
+        function cerrarModalWalkin(event) {
+            if (event && event.target !== document.getElementById('walkinModal')) return;
+            document.getElementById('walkinModal').classList.remove('show');
+        }
+
+        function agregarAcompWalkin() {
+            walkinAcompanantes.push({ id: Date.now() + Math.random(), nombre: '', edad: '' });
+            renderWalkinAcompanantes();
+        }
+
+        function quitarAcompWalkin(id) {
+            walkinAcompanantes = walkinAcompanantes.filter(a => a.id !== id);
+            renderWalkinAcompanantes();
+        }
+
+        function actualizarAcompWalkin(id, campo, valor) {
+            const item = walkinAcompanantes.find(a => a.id === id);
+            if (item) item[campo] = valor;
+            actualizarTotalesWalkin();
+        }
+
+        function actualizarTotalesWalkin() {
+            let totalPersonas = 1 + walkinAcompanantes.length;
+            let totalMonto = VALOR_ADULTO;
+            walkinAcompanantes.forEach(a => {
+                totalMonto += calcularTarifaPorEdad(a.edad);
+            });
+            document.getElementById('walkinResumenCupos').innerText = `Total: ${totalPersonas} persona(s)`;
+            document.getElementById('walkinResumenMonto').innerText = formatearCLP(totalMonto);
+        }
+
+        function renderWalkinAcompanantes() {
+            const list = document.getElementById('walkinAcompList');
+            if (!walkinAcompanantes.length) {
+                list.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted);">Solo titular (pulsa "+ Agregar" si viene acompañado).</div>`;
+            } else {
+                list.innerHTML = walkinAcompanantes.map((a, idx) => `
+                    <div style="display:grid; grid-template-columns:1fr 78px 32px; gap:6px; align-items:center;">
+                        <input type="text" class="walkin-input" style="padding:8px 10px; font-size:0.84rem;" placeholder="Nombre acomp. #${idx + 1}" value="${a.nombre}" oninput="actualizarAcompWalkin(${a.id}, 'nombre', this.value)">
+                        <input type="number" class="walkin-input" style="padding:8px 8px; font-size:0.84rem;" min="0" max="110" placeholder="Edad" value="${a.edad}" oninput="actualizarAcompWalkin(${a.id}, 'edad', this.value)">
+                        <button type="button" onclick="quitarAcompWalkin(${a.id})" style="background:#fee2e2; color:#b91c1c; border:none; border-radius:10px; height:36px; cursor:pointer;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            actualizarTotalesWalkin();
+        }
+
+        async function guardarRegistroEnPuerta() {
+            const nombreTitular = document.getElementById('walkinNombre').value.trim();
+            if (!nombreTitular) {
+                mostrarEstado('Escribe el nombre del invitado para registrarlo en puerta.', true);
+                return;
+            }
+
+            for (let i = 0; i < walkinAcompanantes.length; i++) {
+                if (!walkinAcompanantes[i].nombre.trim()) {
+                    mostrarEstado(`Escribe el nombre del acompañante #${i + 1}.`, true);
+                    return;
+                }
+            }
+
+            const telefono = document.getElementById('walkinTelefono').value.trim();
+            const ensalada = document.getElementById('walkinEnsalada').value.trim();
+            const marcarPagado = document.getElementById('walkinMarcarPagado').checked;
+            const marcarIngreso = document.getElementById('walkinMarcarIngreso').checked;
+
+            const codigoCupon = 'AG-' + Math.floor(1000 + Math.random() * 9000);
+            const idx = gruposFamiliares.length;
+            const groupId = `mesa_${idx}_${codigoCupon}`;
+            const fechaStr = new Date().toLocaleDateString('es-CL');
+
+            let totalMonto = VALOR_ADULTO;
+            const acompanantesTexto = walkinAcompanantes.map(a => {
+                const edadNum = a.edad !== '' ? Number(a.edad) : null;
+                const val = calcularTarifaPorEdad(edadNum);
+                totalMonto += val;
+                const tarifaTxt = val === 0 ? 'Gratis' : formatearCLP(val);
+                return edadNum !== null ? `${a.nombre.trim()} (${edadNum} años · ${tarifaTxt})` : `${a.nombre.trim()} (${tarifaTxt})`;
+            }).join('; ');
+
+            const miembrosGrupo = [];
+            const keysCreadas = [];
+
+            const objTitular = {
+                stableKey: `${codigoCupon}_Titular_${idx}`,
+                groupId,
+                codigoCupon,
+                nombre: nombreTitular,
+                edad: null,
+                valor: VALOR_ADULTO,
+                rol: 'Titular',
+                titularGrupo: nombreTitular,
+                telefono,
+                ensalada,
+                fecha: fechaStr
+            };
+            personasUnificadas.push(objTitular);
+            miembrosGrupo.push(objTitular);
+            keysCreadas.push(objTitular.stableKey);
+
+            walkinAcompanantes.forEach((a, aIdx) => {
+                const edadNum = a.edad !== '' ? Number(a.edad) : null;
+                const val = calcularTarifaPorEdad(edadNum);
+                const objAcomp = {
+                    stableKey: `${codigoCupon}_Acomp_${aIdx}_${a.nombre.trim()}`,
+                    groupId,
+                    codigoCupon,
+                    nombre: a.nombre.trim(),
+                    edad: edadNum,
+                    valor: val,
+                    rol: 'Acompañante',
+                    titularGrupo: nombreTitular,
+                    telefono,
+                    ensalada,
+                    fecha: fechaStr
+                };
+                personasUnificadas.push(objAcomp);
+                miembrosGrupo.push(objAcomp);
+                keysCreadas.push(objAcomp.stableKey);
+            });
+
+            gruposFamiliares.push({
+                groupId,
+                codigoCupon,
+                titular: nombreTitular,
+                telefono,
+                ensalada,
+                fecha: fechaStr,
+                miembros: miembrosGrupo
+            });
+
+            miembrosGrupo.forEach(m => {
+                if (marcarPagado && m.valor > 0) paymentMap[m.stableKey] = true;
+                if (marcarIngreso) checkinMap[m.stableKey] = true;
+            });
+
+            try {
+                localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentMap));
+                localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkinMap));
+            } catch (e) {}
+
+            actualizarKPIs();
+            renderTabla();
+            renderVistaRecepcion();
+            renderVistaPagos();
+            cerrarModalWalkin();
+            mostrarEstado(`¡Registrado en puerta! Pase #${codigoCupon} (${nombreTitular}) agregado.`, false);
+
+            // Guardar fila y estados en Google Sheets en segundo plano
+            if (SCRIPT_URL) {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        codigoCupon,
+                        nombre: nombreTitular,
+                        telefono,
+                        enGrupo: walkinAcompanantes.length > 0 ? 'Sí' : 'No',
+                        acompanantes: acompanantesTexto,
+                        totalCupos: miembrosGrupo.length,
+                        totalMonto,
+                        mensaje: ensalada
+                    })
+                }).then(() => sincronizarEstadosEnNube(keysCreadas)).catch(() => {});
+            }
         }
 
         function confirmarResetCheckin() {
