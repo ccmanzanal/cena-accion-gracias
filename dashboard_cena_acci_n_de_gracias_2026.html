@@ -1,0 +1,3296 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Cena de Acción de Gracias · Gala 2026</title>
+    <!-- FontAwesome para iconos -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts: Cinzel Decorative + Cormorant Garamond + Plus Jakarta Sans -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:ital,wght@0,600;0,700;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Chart.js para gráficos interactivos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- SheetJS para exportar a Excel (.xlsx) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <!-- Html5-QRCode para escanear tickets con la cámara del celular -->
+    <script src="https://unpkg.com/html5-qrcode"></script>
+
+    <style>
+        :root {
+            --bordo-deep: #3d0814;
+            --bordo-primary: #5e0b1f;
+            --bordo-rich: #7a122b;
+            --gold-primary: #d4af37;
+            --gold-light: #f3e5ab;
+            --gold-dark: #aa8222;
+            --cream-bg: #fffcf7;
+            --glass-bg: rgba(255, 252, 247, 0.92);
+            --glass-card: rgba(255, 252, 247, 0.96);
+            --border-gold: rgba(212, 175, 55, 0.55);
+            --text-dark: #2a0810;
+            --text-muted: #6b4c53;
+            --card-radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+        }
+
+        body {
+            background: radial-gradient(circle at top center, #6b0f26 0%, #3d0814 55%, #24040b 100%);
+            color: var(--text-dark);
+            min-height: 100vh;
+            padding: 20px 16px 60px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        .gala-ambient {
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(2px 2px at 15% 25%, rgba(243, 229, 171, 0.38), transparent),
+                radial-gradient(2px 2px at 82% 18%, rgba(212, 175, 55, 0.35), transparent),
+                radial-gradient(3px 3px at 72% 78%, rgba(243, 229, 171, 0.28), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1280px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Header de Gala */
+        header {
+            background: var(--glass-bg);
+            backdrop-filter: blur(22px);
+            -webkit-backdrop-filter: blur(22px);
+            border: 2px solid var(--border-gold);
+            border-radius: var(--card-radius);
+            padding: 22px 26px;
+            box-shadow: 0 22px 48px rgba(0, 0, 0, 0.42), 0 0 24px rgba(212, 175, 55, 0.18);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .brand-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .logo-frame {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, #ffffff, #f8f0df);
+            border: 2.5px solid var(--gold-primary);
+            box-shadow: 0 10px 24px rgba(94, 11, 31, 0.25);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            overflow: hidden;
+            padding: 6px;
+        }
+
+        .logo-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .brand-subtitle {
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 3.5px;
+            color: var(--gold-dark);
+            text-transform: uppercase;
+        }
+
+        .brand-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.75rem;
+            font-weight: 900;
+            color: var(--bordo-primary);
+            line-height: 1.1;
+            text-transform: uppercase;
+        }
+
+        .brand-desc {
+            font-size: 0.86rem;
+            color: var(--text-muted);
+            font-weight: 600;
+            margin-top: 3px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            color: var(--bordo-primary);
+            padding: 11px 16px;
+            border-radius: 14px;
+            font-size: 0.88rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(61, 8, 20, 0.08);
+        }
+
+        .btn:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            border-color: var(--gold-dark);
+        }
+
+        .btn-gala {
+            background: linear-gradient(135deg, var(--bordo-deep), var(--bordo-rich));
+            color: var(--gold-light);
+            border: 1.5px solid var(--gold-primary);
+            box-shadow: 0 8px 20px rgba(61, 8, 20, 0.3);
+        }
+
+        .btn-gala:hover {
+            background: linear-gradient(135deg, var(--bordo-rich), var(--bordo-deep));
+            color: #ffffff;
+        }
+
+        .btn-gold {
+            background: linear-gradient(135deg, #d4af37, #aa8222);
+            color: #24040b;
+            border: 1.5px solid #f3e5ab;
+            box-shadow: 0 8px 20px rgba(170, 130, 34, 0.3);
+        }
+
+        .btn-gold:hover {
+            background: linear-gradient(135deg, #e5c158, #b88c24);
+            color: #24040b;
+        }
+
+        .btn-icon-only {
+            padding: 11px 14px;
+            font-size: 1.05rem;
+            color: #15803d;
+            border-color: rgba(21, 128, 61, 0.35);
+        }
+
+        .btn-icon-only:hover {
+            background: #15803d;
+            color: #ffffff;
+        }
+
+        .btn-danger {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1.5px solid rgba(185, 28, 28, 0.25);
+        }
+
+        .btn-danger:hover {
+            background: #dc2626;
+            color: #ffffff;
+        }
+
+        /* Banner de estado */
+        .status-banner {
+            background: var(--glass-card);
+            border: 1.5px solid var(--border-gold);
+            border-left: 5px solid var(--gold-primary);
+            border-radius: 16px;
+            padding: 13px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            color: var(--bordo-primary);
+        }
+
+        .status-banner.error {
+            border-left-color: #dc2626;
+            color: #991b1b;
+            background: #fef2f2;
+        }
+
+        .status-banner.hidden {
+            display: none;
+        }
+
+        /* 6 Pines KPI */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(195px, 1fr));
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+
+        .kpi-card {
+            background: var(--glass-bg);
+            border: 1.5px solid var(--border-gold);
+            border-radius: 22px;
+            padding: 18px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+            cursor: pointer;
+            transition: all 0.22s ease;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-3px);
+            background: #ffffff;
+            border-color: var(--gold-primary);
+        }
+
+        .kpi-card.active-pin {
+            background: #ffffff;
+            border: 2.5px solid var(--gold-primary);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
+        }
+
+        .kpi-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .kpi-title {
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.7px;
+            color: var(--text-muted);
+        }
+
+        .kpi-icon {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.92rem;
+            background: rgba(212, 175, 55, 0.18);
+            color: var(--bordo-primary);
+        }
+
+        .kpi-value {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--bordo-primary);
+            line-height: 1;
+        }
+
+        .kpi-sub {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+
+        .pin-hint {
+            margin-top: 10px;
+            padding-top: 8px;
+            border-top: 1px dashed rgba(212, 175, 55, 0.45);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            font-weight: 800;
+            color: var(--gold-dark);
+        }
+
+        /* Cajón desplegable de Pin */
+        .pin-drawer {
+            background: #ffffff;
+            border: 2px solid var(--gold-primary);
+            border-radius: 22px;
+            padding: 20px;
+            margin-bottom: 22px;
+            box-shadow: 0 20px 44px rgba(0, 0, 0, 0.35);
+            display: none;
+        }
+
+        .pin-drawer.open {
+            display: block;
+        }
+
+        .pin-drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 12px;
+            border-bottom: 1.5px solid rgba(212, 175, 55, 0.35);
+        }
+
+        .pin-drawer-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--bordo-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pin-list-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+            gap: 10px;
+            max-height: 360px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .pin-person-item {
+            background: var(--cream-bg);
+            border: 1px solid rgba(212, 175, 55, 0.45);
+            border-radius: 14px;
+            padding: 11px 14px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.18s ease;
+        }
+
+        .pin-person-item:hover {
+            border-color: var(--bordo-primary);
+            transform: translateY(-2px);
+        }
+
+        /* Gráficos Interactivos */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        .chart-card {
+            background: var(--glass-bg);
+            border: 1.5px solid var(--border-gold);
+            border-radius: var(--card-radius);
+            padding: 20px;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+        }
+
+        .chart-card h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: var(--bordo-primary);
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-hint {
+            font-size: 0.74rem;
+            font-weight: 700;
+            color: var(--gold-dark);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 210px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        /* Píldoras de filtro rápido */
+        .quick-pills-bar {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 14px;
+        }
+
+        .filter-pill {
+            padding: 8px 14px;
+            border-radius: 99px;
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            color: var(--bordo-primary);
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.2s ease;
+        }
+
+        .filter-pill:hover {
+            background: var(--gold-light);
+        }
+
+        .filter-pill.active {
+            background: var(--bordo-primary);
+            color: var(--gold-light);
+            border-color: var(--gold-primary);
+        }
+
+        /* Contenedor de Tabla */
+        .table-card {
+            background: var(--glass-bg);
+            border: 1.5px solid var(--border-gold);
+            border-radius: var(--card-radius);
+            padding: 22px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .table-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 14px;
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gold-dark);
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border-radius: 14px;
+            border: 1.5px solid var(--border-gold);
+            background: #ffffff;
+            font-size: 0.94rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .search-box input:focus {
+            border-color: var(--bordo-primary);
+            box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.2);
+        }
+
+        .view-tabs {
+            display: flex;
+            background: rgba(94, 11, 31, 0.08);
+            padding: 4px;
+            border-radius: 14px;
+            border: 1px solid var(--border-gold);
+        }
+
+        .tab-btn {
+            padding: 8px 14px;
+            border: none;
+            background: transparent;
+            border-radius: 10px;
+            font-size: 0.84rem;
+            font-weight: 800;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .tab-btn.active {
+            background: var(--bordo-primary);
+            color: var(--gold-light);
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 16px;
+            background: #ffffff;
+            border: 1.5px solid rgba(212, 175, 55, 0.35);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            min-width: 820px;
+        }
+
+        th {
+            background: rgba(94, 11, 31, 0.07);
+            padding: 13px 15px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--bordo-primary);
+            border-bottom: 1.5px solid rgba(212, 175, 55, 0.4);
+        }
+
+        td {
+            padding: 13px 15px;
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(94, 11, 31, 0.07);
+            vertical-align: middle;
+        }
+
+        tbody tr.clickable-row {
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        tbody tr.clickable-row:hover {
+            background: rgba(212, 175, 55, 0.12);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 99px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            white-space: nowrap;
+        }
+
+        .badge-bordo { background: rgba(94, 11, 31, 0.12); color: var(--bordo-primary); }
+        .badge-gold { background: rgba(212, 175, 55, 0.25); color: #78550a; }
+        .badge-green { background: #dcfce7; color: #15803d; }
+        .badge-amber { background: #fef3c7; color: #b45309; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        .badge-red { background: #fee2e2; color: #b91c1c; }
+
+        .wa-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: #dcfce7;
+            color: #15803d;
+            padding: 5px 11px;
+            border-radius: 99px;
+            font-weight: 700;
+            font-size: 0.82rem;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .wa-link:hover {
+            background: #16a34a;
+            color: #ffffff;
+        }
+
+        /* Sub-vistas (Recepción Puerta y Control de Pagos) */
+        .sub-view { display: none; }
+        .sub-view.active { display: block; }
+        .main-view.hidden { display: none; }
+
+        .sub-header-card {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-gold);
+            border-radius: var(--card-radius);
+            padding: 20px 24px;
+            margin-bottom: 18px;
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        .progress-bar-track {
+            width: 100%;
+            height: 14px;
+            background: rgba(94, 11, 31, 0.12);
+            border-radius: 99px;
+            overflow: hidden;
+            margin: 12px 0 8px;
+        }
+
+        .progress-bar-gold {
+            height: 100%;
+            background: linear-gradient(90deg, var(--bordo-primary), var(--gold-primary));
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .progress-bar-green {
+            height: 100%;
+            background: linear-gradient(90deg, #15803d, #d4af37);
+            width: 0%;
+            transition: width 0.35s ease;
+        }
+
+        .checkin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(295px, 1fr));
+            gap: 12px;
+        }
+
+        .checkin-card {
+            background: #ffffff;
+            border: 2px solid var(--border-gold);
+            border-radius: 18px;
+            padding: 15px 16px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        .checkin-card:hover {
+            transform: translateY(-2px);
+            border-color: var(--bordo-primary);
+        }
+
+        .checkin-card.checked {
+            background: #dcfce7;
+            border-color: #16a34a;
+        }
+
+        .checkin-box {
+            width: 30px;
+            height: 30px;
+            border-radius: 10px;
+            border: 2px solid var(--bordo-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            color: transparent;
+            background: #ffffff;
+            flex-shrink: 0;
+        }
+
+        .checkin-card.checked .checkin-box {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+
+        /* Acordeón de Pagos por Mesa / Familia */
+        .pay-summary-strip {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 12px;
+            margin-top: 14px;
+        }
+
+        .pay-stat-box {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 12px 15px;
+        }
+
+        .pay-stat-label {
+            font-size: 0.74rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .pay-stat-num {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            margin-top: 2px;
+        }
+
+        .pay-families-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .pay-family-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .pay-family-card.family-complete {
+            border-color: #16a34a;
+            background: #f0fdf4;
+        }
+
+        .pay-family-header {
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            cursor: pointer;
+        }
+
+        .pay-family-body {
+            display: none;
+            padding: 0 20px 18px;
+            border-top: 1px dashed rgba(212, 175, 55, 0.5);
+            background: var(--cream-bg);
+        }
+
+        .pay-family-card.expanded .pay-family-body {
+            display: block;
+        }
+
+        .pay-member-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            padding: 11px 14px;
+            margin-top: 10px;
+            background: #ffffff;
+            border: 1.5px solid rgba(212, 175, 55, 0.35);
+            border-radius: 14px;
+        }
+
+        .pay-member-row.member-paid {
+            background: #dcfce7;
+            border-color: #16a34a;
+        }
+
+        .pay-member-row.member-absent {
+            background: #fef2f2;
+            border-color: rgba(220, 38, 38, 0.35);
+            opacity: 0.85;
+        }
+
+        .pay-check-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 12px;
+            border-radius: 11px;
+            border: 1.5px solid var(--bordo-primary);
+            background: #ffffff;
+            color: var(--bordo-primary);
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        .pay-check-trigger.active {
+            background: #16a34a;
+            border-color: #16a34a;
+            color: #ffffff;
+        }
+
+        .absent-check-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 11px;
+            border-radius: 11px;
+            border: 1.5px solid rgba(100, 116, 139, 0.35);
+            background: #f8fafc;
+            color: #475569;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+        }
+
+        .absent-check-trigger.active {
+            background: #dc2626;
+            border-color: #dc2626;
+            color: #ffffff;
+        }
+
+        /* Drawer lateral de Ficha de Invitado */
+        .person-drawer-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 3, 8, 0.62);
+            backdrop-filter: blur(4px);
+            z-index: 150;
+            display: none;
+            justify-content: flex-end;
+        }
+
+        .person-drawer-backdrop.open {
+            display: flex;
+        }
+
+        .person-drawer-panel {
+            width: 100%;
+            max-width: 440px;
+            height: 100%;
+            background: var(--cream-bg);
+            border-left: 2px solid var(--gold-primary);
+            padding: 24px 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .drawer-box {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 18px;
+            padding: 16px;
+        }
+
+        .drawer-toggle-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 11px 0;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.28);
+        }
+
+        .drawer-toggle-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+        }
+
+        /* Modal reset */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 3, 8, 0.65);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 200;
+            padding: 16px;
+        }
+
+        .modal-backdrop.show { display: flex; }
+
+        .modal-box {
+            background: #ffffff;
+            border: 2px solid var(--gold-primary);
+            border-radius: 22px;
+            padding: 24px;
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Estilos del Escáner QR de Gala */
+        .qr-modal-box {
+            background: var(--cream-bg);
+            border: 2.5px solid var(--gold-primary);
+            border-radius: 26px;
+            padding: 22px;
+            max-width: 450px;
+            width: 100%;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55), 0 0 28px rgba(212, 175, 55, 0.25);
+        }
+
+        .qr-reader-frame {
+            width: 100%;
+            border-radius: 18px;
+            overflow: hidden;
+            border: 2px solid var(--bordo-primary);
+            background: #1a0308;
+            margin: 12px 0;
+        }
+
+        .qr-result-card {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 18px;
+            padding: 16px;
+            margin-top: 12px;
+            text-align: left;
+            animation: popQrCard 0.25s ease forwards;
+        }
+
+        @keyframes popQrCard {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        @media (max-width: 640px) {
+            .brand-title { font-size: 1.35rem; }
+        }
+
+        /* Tarjetas de Comando Principal (4 Acciones Protagonistas) */
+        .hero-actions-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 22px;
+        }
+
+        @media (max-width: 960px) {
+            .hero-actions-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 520px) {
+            .hero-actions-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .hero-action-btn {
+            background: var(--glass-bg);
+            border: 2px solid var(--border-gold);
+            border-radius: 24px;
+            padding: 22px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-align: left;
+            transition: all 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.28);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-action-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.38), 0 0 22px rgba(212, 175, 55, 0.28);
+        }
+
+        .hero-action-btn.primary-bordo {
+            background: linear-gradient(145deg, var(--bordo-deep) 0%, var(--bordo-rich) 100%);
+            border: 2px solid var(--gold-primary);
+            color: var(--gold-light);
+        }
+
+        .hero-action-btn.primary-gold {
+            background: linear-gradient(145deg, #f3e5ab 0%, #d4af37 60%, #b38728 100%);
+            border: 2px solid #fff6d6;
+            color: #24040b;
+        }
+
+        .hero-action-icon {
+            width: 56px;
+            height: 56px;
+            border-radius: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.55rem;
+            flex-shrink: 0;
+            background: rgba(212, 175, 55, 0.18);
+            color: var(--bordo-primary);
+        }
+
+        .primary-bordo .hero-action-icon {
+            background: rgba(212, 175, 55, 0.22);
+            color: var(--gold-light);
+            border: 1px solid rgba(243, 229, 171, 0.35);
+        }
+
+        .primary-gold .hero-action-icon {
+            background: rgba(36, 4, 11, 0.14);
+            color: #24040b;
+        }
+
+        .hero-action-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.06rem;
+            font-weight: 900;
+            line-height: 1.2;
+            color: var(--bordo-primary);
+        }
+
+        .primary-bordo .hero-action-title {
+            color: var(--gold-light);
+        }
+
+        .primary-gold .hero-action-title {
+            color: #24040b;
+        }
+
+        .hero-action-sub {
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 4px;
+            color: var(--text-muted);
+            line-height: 1.3;
+        }
+
+        .primary-bordo .hero-action-sub {
+            color: rgba(255, 252, 247, 0.82);
+        }
+
+        .primary-gold .hero-action-sub {
+            color: rgba(36, 4, 11, 0.82);
+        }
+
+        /* Pantalla de Bloqueo PIN de Gala */
+        .pin-lock-overlay {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at top center, #5e0b1f 0%, #2a040d 65%, #160206 100%);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            transition: opacity 0.35s ease, visibility 0.35s ease;
+        }
+
+        .pin-lock-overlay.unlocked {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        .pin-lock-card {
+            background: var(--cream-bg);
+            border: 2.5px solid var(--gold-primary);
+            border-radius: 28px;
+            padding: 28px 24px;
+            max-width: 370px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 28px 64px rgba(0, 0, 0, 0.65), 0 0 32px rgba(212, 175, 55, 0.25);
+        }
+
+        .pin-dots-row {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin: 18px 0 12px;
+        }
+
+        .pin-dot {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid var(--bordo-primary);
+            background: transparent;
+            transition: all 0.18s ease;
+        }
+
+        .pin-dot.filled {
+            background: var(--bordo-primary);
+            box-shadow: 0 0 10px rgba(94, 11, 31, 0.45);
+            transform: scale(1.12);
+        }
+
+        .pin-dot.error {
+            border-color: #dc2626;
+            background: #dc2626;
+        }
+
+        .pin-keypad {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 16px;
+        }
+
+        .pin-key-btn {
+            background: #ffffff;
+            border: 1.5px solid var(--border-gold);
+            border-radius: 16px;
+            padding: 14px 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--bordo-primary);
+            cursor: pointer;
+            transition: all 0.15s ease;
+            box-shadow: 0 4px 10px rgba(61, 8, 20, 0.06);
+        }
+
+        .pin-key-btn:hover {
+            background: var(--gold-light);
+            border-color: var(--gold-dark);
+        }
+
+        .pin-key-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Modal Registro Presencial en Puerta */
+        .walkin-modal-box {
+            background: var(--cream-bg);
+            border: 2.5px solid var(--gold-primary);
+            border-radius: 26px;
+            padding: 24px;
+            max-width: 470px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 28px 60px rgba(0, 0, 0, 0.55);
+            text-align: left;
+        }
+
+        .walkin-input {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 12px;
+            border: 1.5px solid var(--border-gold);
+            background: #ffffff;
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            outline: none;
+        }
+
+        .walkin-input:focus {
+            border-color: var(--bordo-primary);
+        }
+
+        .btn-torch-active {
+            background: #fef08a !important;
+            color: #854d0e !important;
+            border-color: #eab308 !important;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Pantalla de Bloqueo con PIN -->
+    <div id="pinLockOverlay" class="pin-lock-overlay">
+        <div class="pin-lock-card">
+            <div style="width:62px; height:62px; border-radius:50%; background:rgba(212,175,55,0.18); border:2px solid var(--gold-primary); display:flex; align-items:center; justify-content:center; margin:0 auto 12px; color:var(--bordo-primary); font-size:1.45rem;">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div style="font-size:0.72rem; font-weight:800; letter-spacing:2.5px; color:var(--gold-dark); text-transform:uppercase;">Acceso Equipo Gala</div>
+            <h2 style="font-family:'Cinzel Decorative', serif; font-size:1.3rem; font-weight:900; color:var(--bordo-primary); margin-top:4px;">PIN de Seguridad</h2>
+            <p style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-top:4px;">Ingresa el código de 4 dígitos para administrar recepción y pagos.</p>
+
+            <div class="pin-dots-row" id="pinDotsRow">
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+                <div class="pin-dot"></div>
+            </div>
+            <div id="pinErrorMsg" style="min-height:18px; font-size:0.78rem; font-weight:800; color:#dc2626;"></div>
+
+            <div class="pin-keypad">
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('1')">1</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('2')">2</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('3')">3</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('4')">4</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('5')">5</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('6')">6</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('7')">7</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('8')">8</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('9')">9</button>
+                <button type="button" class="pin-key-btn" style="font-size:0.9rem; color:var(--text-muted);" onclick="limpiarPin()">Limpiar</button>
+                <button type="button" class="pin-key-btn" onclick="ingresarDigitoPin('0')">0</button>
+                <button type="button" class="pin-key-btn" onclick="borrarDigitoPin()"><i class="fa-solid fa-delete-left"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div class="gala-ambient"></div>
+
+    <div class="container">
+        <!-- Encabezado -->
+        <header>
+            <div class="brand-box">
+                <div class="logo-frame">
+                    <img src="logo-cena.png" alt="Logo Cena Acción de Gracias" onerror="this.style.display='none'; document.getElementById('dashLogoFallback').style.display='flex';">
+                    <div id="dashLogoFallback" style="display:none; flex-direction:column; align-items:center; color:var(--bordo-primary);">
+                        <i class="fa-solid fa-champagne-glasses" style="font-size:1.5rem; color:var(--gold-dark);"></i>
+                    </div>
+                </div>
+                <div>
+                    <div class="brand-subtitle">GALA 27 DIC · 19:30 HRS</div>
+                    <div class="brand-title">Cena de Acción de Gracias</div>
+                    <div class="brand-desc">
+                        <span>Panel de mesas, recaudación y ensaladas · Centro Cristiano Manzanal</span>
+                        <span id="cloudSyncBadge" style="display:inline-flex; align-items:center; gap:5px; font-size:0.74rem; font-weight:800; padding:3px 10px; border-radius:99px; background:rgba(212,175,55,0.22); color:var(--bordo-primary);">
+                            <i class="fa-solid fa-cloud"></i> Listo para conectar
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="actions" id="mainHeaderActions">
+                <button class="btn btn-gala" onclick="abrirModalWalkin()"><i class="fa-solid fa-user-plus"></i> + Invitado en Puerta</button>
+                <button class="btn" onclick="cargarDatos(false)"><i class="fa-solid fa-rotate"></i> Actualizar</button>
+                <button class="btn btn-icon-only" onclick="exportarExcel()" title="Descargar Excel" aria-label="Descargar Excel">
+                    <i class="fa-solid fa-file-excel"></i>
+                </button>
+                <button class="btn" onclick="bloquearDashboard()" title="Bloquear pantalla con PIN" aria-label="Bloquear pantalla">
+                    <i class="fa-solid fa-lock"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Mensaje de estado -->
+        <div id="statusBanner" class="status-banner hidden">
+            <i class="fa-solid fa-circle-info"></i>
+            <span id="statusText">Cargando reservas...</span>
+        </div>
+
+        <!-- ==================== VISTA PRINCIPAL ==================== -->
+        <div id="mainDashboardView" class="main-view">
+            <!-- 4 Tarjetas de Comando Protagonistas -->
+            <div class="hero-actions-grid">
+                <button type="button" class="hero-action-btn primary-bordo" onclick="abrirEscanerQR()">
+                    <div class="hero-action-icon"><i class="fa-solid fa-qrcode"></i></div>
+                    <div>
+                        <div class="hero-action-title">Escanear QR</div>
+                        <div class="hero-action-sub">Validar pase VIP e ingreso en puerta</div>
+                    </div>
+                </button>
+
+                <button type="button" class="hero-action-btn" onclick="abrirVistaRecepcion()">
+                    <div class="hero-action-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                    <div>
+                        <div class="hero-action-title">Recepción Puerta</div>
+                        <div class="hero-action-sub">Lista manual de asistencia al salón</div>
+                    </div>
+                </button>
+
+                <button type="button" class="hero-action-btn primary-gold" onclick="abrirVistaPagos()">
+                    <div class="hero-action-icon"><i class="fa-solid fa-coins"></i></div>
+                    <div>
+                        <div class="hero-action-title">Control de Pagos</div>
+                        <div class="hero-action-sub">Cobros por mesa, adultos y niños</div>
+                    </div>
+                </button>
+
+                <button type="button" class="hero-action-btn" onclick="abrirVistaBalance()">
+                    <div class="hero-action-icon"><i class="fa-solid fa-chart-pie"></i></div>
+                    <div>
+                        <div class="hero-action-title">Balance y Gráficos</div>
+                        <div class="hero-action-sub">Cuentas totales, recaudación y ensaladas</div>
+                    </div>
+                </button>
+            </div>
+
+            <!-- Tabla Unificada y por Mesa (Colapsable) -->
+            <div class="table-card" id="tablaSection">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; cursor:pointer;" onclick="toggleListaInvitados()">
+                    <div style="display:flex; align-items:center; gap:12px;">
+                        <div style="width:42px; height:42px; border-radius:14px; background:rgba(94,11,31,0.1); color:var(--bordo-primary); display:flex; align-items:center; justify-content:center; font-size:1.1rem;">
+                            <i class="fa-solid fa-users-rectangle"></i>
+                        </div>
+                        <div>
+                            <h3 style="font-family:'Cinzel Decorative', serif; font-size:1.1rem; font-weight:900; color:var(--bordo-primary);">
+                                Directorio de Invitados y Mesas
+                            </h3>
+                            <p style="font-size:0.8rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
+                                <span id="tablaResumenCount">0 invitados registrados</span> · Toca para ver o buscar en la lista completa
+                            </p>
+                        </div>
+                    </div>
+                    <button type="button" id="btnToggleLista" class="btn btn-gold" style="padding:9px 15px; font-size:0.84rem;" onclick="event.stopPropagation(); toggleListaInvitados()">
+                        <i class="fa-solid fa-chevron-down"></i> Mostrar Lista
+                    </button>
+                </div>
+
+                <div id="tablaCollapsibleBody" style="display:none; margin-top:18px; padding-top:16px; border-top:1.5px dashed rgba(212,175,55,0.45);">
+                    <div class="quick-pills-bar" id="quickFilterPills">
+                        <button class="filter-pill active" data-filter="all" onclick="setQuickFilter('all')"><i class="fa-solid fa-users"></i> Todos <span id="pillCountAll"></span></button>
+                        <button class="filter-pill" data-filter="adultos" onclick="setQuickFilter('adultos')"><i class="fa-solid fa-user-tie"></i> Tarifa General ($5.000) <span id="pillCountAdultos"></span></button>
+                        <button class="filter-pill" data-filter="pendiente_pago" onclick="setQuickFilter('pendiente_pago')"><i class="fa-solid fa-clock"></i> Pagos Pendientes <span id="pillCountPendientes"></span></button>
+                        <button class="filter-pill" data-filter="ninos" onclick="setQuickFilter('ninos')"><i class="fa-solid fa-child"></i> Niños (≤12 años) <span id="pillCountNinos"></span></button>
+                        <button class="filter-pill" data-filter="con_ensalada" onclick="setQuickFilter('con_ensalada')"><i class="fa-solid fa-bowl-food"></i> Con Ensalada <span id="pillCountEnsalada"></span></button>
+                        <button class="filter-pill" data-filter="ingresados" onclick="setQuickFilter('ingresados')"><i class="fa-solid fa-check-double"></i> En Salón ✓ <span id="pillCountSalon"></span></button>
+                    </div>
+
+                    <div class="table-controls">
+                        <div class="search-box">
+                            <i class="fa-solid fa-magnifying-glass"></i>
+                            <input type="text" id="searchInput" placeholder="Buscar por nombre, código #AG-, teléfono o ensalada..." oninput="renderTabla()">
+                        </div>
+
+                        <div class="view-tabs">
+                            <button class="tab-btn active" id="tabUnificado" onclick="cambiarVistaTabla('unificado')">
+                                <i class="fa-solid fa-list-ul"></i> Lista Invitados
+                            </button>
+                            <button class="tab-btn" id="tabFamilias" onclick="cambiarVistaTabla('familias')">
+                                <i class="fa-solid fa-people-roof"></i> Por Reserva / Mesa
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table>
+                            <thead id="tablaHead"></thead>
+                            <tbody id="tablaBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== VISTA DEDICADA: RECEPCIÓN PUERTA ==================== -->
+        <div id="recepcionView" class="sub-view">
+            <div class="sub-header-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.35rem; font-weight:900;">
+                            <i class="fa-solid fa-champagne-glasses" style="color:var(--gold-dark);"></i> Recepción de Invitados en Puerta
+                        </h2>
+                        <p style="font-size:0.86rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
+                            Escanea el QR del cupón o toca cada invitado conforme llega al salón.
+                        </p>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button class="btn btn-gala" onclick="abrirEscanerQR()"><i class="fa-solid fa-qrcode"></i> Escanear QR</button>
+                        <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
+                        <button class="btn btn-danger" onclick="abrirModalReset()"><i class="fa-solid fa-rotate-left"></i> Reiniciar</button>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:var(--bordo-primary);">
+                        <span id="checkinCounterText">0 de 0 invitados en el salón</span>
+                        <span id="checkinPercentText">0%</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-gold" id="checkinProgressFill"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+                    <div class="search-box" style="flex:1; min-width:220px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="checkinSearchInput" placeholder="Buscar por nombre o código #AG-..." oninput="renderVistaRecepcion()">
+                    </div>
+                    <div class="view-tabs">
+                        <button class="tab-btn active" id="checkinFilterTodos" onclick="setCheckinFilter('todos')">Todos</button>
+                        <button class="tab-btn" id="checkinFilterFaltan" onclick="setCheckinFilter('faltan')">Por llegar</button>
+                        <button class="tab-btn" id="checkinFilterDentro" onclick="setCheckinFilter('dentro')">En salón ✓</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="checkinChecklistContainer" class="checkin-grid"></div>
+        </div>
+
+        <!-- ==================== VISTA DEDICADA: CONTROL DE PAGOS POR MESA ==================== -->
+        <div id="paymentControlView" class="sub-view">
+            <div class="sub-header-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.35rem; font-weight:900;">
+                            <i class="fa-solid fa-coins" style="color:var(--gold-dark);"></i> Control de Pagos por Mesa
+                        </h2>
+                        <p style="font-size:0.86rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
+                            Tarifa general: <strong>$5.000</strong> · Niños 5-12 años: <strong>$3.000</strong> · Hasta 4 años: <strong>Gratis</strong>.
+                        </p>
+                    </div>
+                    <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
+                </div>
+
+                <div class="pay-summary-strip">
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Recaudado Confirmado</div>
+                        <div class="pay-stat-num" id="payAmountCollected" style="color:#15803d;">$0</div>
+                    </div>
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Saldo Pendiente</div>
+                        <div class="pay-stat-num" id="payAmountPending" style="color:#b45309;">$0</div>
+                    </div>
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Total Esperado (Activos)</div>
+                        <div class="pay-stat-num" id="payAmountExpected" style="color:var(--bordo-primary);">$0</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:14px;">
+                    <div style="display:flex; justify-content:space-between; font-weight:800; font-size:0.95rem; color:#15803d;">
+                        <span id="payCounterText">$0 de $0 recaudados</span>
+                        <span id="payPercentText">0%</span>
+                    </div>
+                    <div class="progress-bar-track">
+                        <div class="progress-bar-green" id="payProgressFill"></div>
+                    </div>
+                </div>
+
+                <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:14px;">
+                    <div class="search-box" style="flex:1; min-width:220px;">
+                        <i class="fa-solid fa-magnifying-glass"></i>
+                        <input type="text" id="paySearchInput" placeholder="Buscar por titular, código #AG- o integrante..." oninput="renderVistaPagos()">
+                    </div>
+                    <div class="view-tabs">
+                        <button class="tab-btn active" id="payFilterTodos" onclick="setPayFilter('todos')">Todas las Mesas</button>
+                        <button class="tab-btn" id="payFilterPendientes" onclick="setPayFilter('pendientes')">Con Saldo Pendiente</button>
+                        <button class="tab-btn" id="payFilterPagados" onclick="setPayFilter('pagados')">Mesa Pagada ✓</button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="payFamiliesContainer" class="pay-families-list"></div>
+        </div>
+
+        <!-- ==================== VISTA DEDICADA: BALANCE Y GRÁFICOS ==================== -->
+        <div id="balanceView" class="sub-view">
+            <div class="sub-header-card">
+                <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+                    <div>
+                        <h2 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.35rem; font-weight:900;">
+                            <i class="fa-solid fa-chart-pie" style="color:var(--gold-dark);"></i> Balance General y Estadísticas
+                        </h2>
+                        <p style="font-size:0.86rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
+                            Resumen financiero y distribución para cuenta pública y organización.
+                        </p>
+                    </div>
+                    <button class="btn" onclick="cerrarSubVistas()"><i class="fa-solid fa-arrow-left"></i> Volver al Panel</button>
+                </div>
+
+                <div class="pay-summary-strip">
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Asistentes Activos</div>
+                        <div class="pay-stat-num" id="balTotalAsistentes" style="color:var(--bordo-primary);">0</div>
+                    </div>
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Recaudado Confirmado</div>
+                        <div class="pay-stat-num" id="balTotalRecaudado" style="color:#15803d;">$0</div>
+                    </div>
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Por Recaudar</div>
+                        <div class="pay-stat-num" id="balTotalPendiente" style="color:#b45309;">$0</div>
+                    </div>
+                    <div class="pay-stat-box">
+                        <div class="pay-stat-label">Mesas con Ensalada</div>
+                        <div class="pay-stat-num" id="balTotalEnsaladas" style="color:var(--gold-dark);">0 de 0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="charts-grid">
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-chart-pie" style="color:var(--gold-dark);"></i> Tramos de Adhesión</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar invitados</div>
+                    <div class="chart-wrapper"><canvas id="chartTramos"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-coins" style="color:#15803d;"></i> Estado de Recaudación</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar invitados</div>
+                    <div class="chart-wrapper"><canvas id="chartPagos"></canvas></div>
+                </div>
+                <div class="chart-card">
+                    <h3><i class="fa-solid fa-bowl-food" style="color:var(--bordo-primary);"></i> Ensaladas Comprometidas</h3>
+                    <div class="chart-hint"><i class="fa-solid fa-hand-pointer"></i> Toca un segmento para filtrar mesas</div>
+                    <div class="chart-wrapper"><canvas id="chartEnsaladas"></canvas></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Drawer Lateral de Ficha de Invitado -->
+    <div id="personDrawerBackdrop" class="person-drawer-backdrop" onclick="cerrarFichaPersona(event)">
+        <div class="person-drawer-panel" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <span style="font-size:0.78rem; font-weight:800; text-transform:uppercase; letter-spacing:1.2px; color:var(--gold-dark);">
+                    <i class="fa-solid fa-id-card"></i> Ficha de Invitado
+                </span>
+                <button class="btn" style="padding:6px 12px; font-size:0.82rem;" onclick="cerrarFichaPersona()">
+                    <i class="fa-solid fa-xmark"></i> Cerrar
+                </button>
+            </div>
+            <div id="personDrawerContent"></div>
+        </div>
+    </div>
+
+    <!-- Modal de confirmación para reiniciar recepción -->
+    <div id="confirmModal" class="modal-backdrop">
+        <div class="modal-box">
+            <i class="fa-solid fa-triangle-exclamation" style="font-size:2.4rem; color:#dc2626; margin-bottom:10px;"></i>
+            <h3 style="font-family:'Cormorant Garamond', serif; color:var(--bordo-primary); font-size:1.4rem; font-weight:700;">¿Reiniciar registro de puerta?</h3>
+            <p style="font-size:0.88rem; color:var(--text-muted); margin:8px 0 20px;">Se desmarcarán todos los invitados ingresados al salón.</p>
+            <div style="display:flex; gap:10px; justify-content:center;">
+                <button class="btn" onclick="cerrarModalReset()">Cancelar</button>
+                <button class="btn btn-danger" onclick="confirmarResetCheckin()">Sí, reiniciar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Escáner QR de Gala -->
+    <div id="qrScannerModal" class="modal-backdrop" onclick="cerrarEscanerQR(event)">
+        <div class="qr-modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; gap:8px;">
+                <h3 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.05rem; font-weight:900;">
+                    <i class="fa-solid fa-qrcode" style="color:var(--gold-dark);"></i> Portería Rápida QR
+                </h3>
+                <div style="display:flex; gap:6px;">
+                    <button type="button" id="btnToggleTorch" class="btn" style="padding:6px 11px; font-size:0.78rem; display:none;" onclick="toggleLinternaQR()">
+                        <i class="fa-solid fa-bolt"></i> Luz
+                    </button>
+                    <button type="button" class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="cerrarEscanerQR()">
+                        <i class="fa-solid fa-xmark"></i> Cerrar
+                    </button>
+                </div>
+            </div>
+            <p style="font-size:0.8rem; color:var(--text-muted); font-weight:600; margin-top:4px;">
+                Apunta la cámara al código QR del talón dorado del ticket.
+            </p>
+
+            <div id="qrReaderBox" class="qr-reader-frame"></div>
+
+            <!-- Búsqueda manual rápida por si un celular no da permiso de cámara -->
+            <div style="display:flex; gap:8px; margin-top:8px;">
+                <input type="text" id="manualQrCodeInput" placeholder="O escribe código (ej: AG-1234)" style="flex:1; padding:10px 12px; border-radius:12px; border:1.5px solid var(--border-gold); font-weight:700; font-size:0.86rem; outline:none;">
+                <button type="button" class="btn btn-gold" style="padding:10px 14px;" onclick="buscarCodigoManualQR()">Buscar</button>
+            </div>
+
+            <div id="qrScanResultArea"></div>
+        </div>
+    </div>
+
+    <!-- Modal Registro Presencial en Puerta (Walk-in) -->
+    <div id="walkinModal" class="modal-backdrop" onclick="cerrarModalWalkin(event)">
+        <div class="walkin-modal-box" onclick="event.stopPropagation()">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+                <h3 style="font-family:'Cinzel Decorative', serif; color:var(--bordo-primary); font-size:1.15rem; font-weight:900;">
+                    <i class="fa-solid fa-user-plus" style="color:var(--gold-dark);"></i> Registro en Puerta
+                </h3>
+                <button type="button" class="btn" style="padding:6px 12px; font-size:0.8rem;" onclick="cerrarModalWalkin()">
+                    <i class="fa-solid fa-xmark"></i> Cerrar
+                </button>
+            </div>
+            <p style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-bottom:14px;">
+                Inscribe al instante a invitados que llegan sin formulario previo.
+            </p>
+
+            <div style="display:flex; flex-direction:column; gap:10px;">
+                <div>
+                    <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">Nombre Completo Titular *</label>
+                    <input type="text" id="walkinNombre" class="walkin-input" placeholder="Ej: Roberto Muñoz">
+                </div>
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+                    <div>
+                        <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">WhatsApp (opcional)</label>
+                        <input type="tel" id="walkinTelefono" class="walkin-input" placeholder="+56 9 ...">
+                    </div>
+                    <div>
+                        <label style="font-size:0.76rem; font-weight:800; color:var(--bordo-primary); display:block; margin-bottom:4px;">Ensalada (opcional)</label>
+                        <input type="text" id="walkinEnsalada" class="walkin-input" placeholder="Ej: Chilena">
+                    </div>
+                </div>
+
+                <!-- Acompañantes en puerta -->
+                <div style="background:#ffffff; border:1.5px solid var(--border-gold); border-radius:16px; padding:12px; margin-top:4px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+                        <span style="font-size:0.8rem; font-weight:800; color:var(--bordo-primary);">Acompañantes en esta mesa</span>
+                        <button type="button" class="btn btn-gold" style="padding:5px 10px; font-size:0.76rem;" onclick="agregarAcompWalkin()">
+                            <i class="fa-solid fa-plus"></i> Agregar
+                        </button>
+                    </div>
+                    <div id="walkinAcompList" style="display:flex; flex-direction:column; gap:8px;"></div>
+                </div>
+
+                <div style="display:flex; justify-content:space-between; align-items:center; background:rgba(212,175,55,0.18); border:1.5px solid var(--gold-primary); border-radius:14px; padding:10px 14px; font-weight:800; color:var(--bordo-primary); font-size:0.88rem;">
+                    <span id="walkinResumenCupos">Total: 1 persona (Titular)</span>
+                    <span id="walkinResumenMonto">$5.000</span>
+                </div>
+
+                <div style="display:flex; gap:14px; flex-wrap:wrap; margin-top:2px;">
+                    <label style="display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:800; color:#15803d; cursor:pointer;">
+                        <input type="checkbox" id="walkinMarcarPagado" checked style="width:17px; height:17px; accent-color:#15803d;">
+                        Marcar Pagado en caja
+                    </label>
+                    <label style="display:flex; align-items:center; gap:7px; font-size:0.82rem; font-weight:800; color:var(--bordo-primary); cursor:pointer;">
+                        <input type="checkbox" id="walkinMarcarIngreso" checked style="width:17px; height:17px; accent-color:#5e0b1f;">
+                        Ingresar al salón ahora
+                    </label>
+                </div>
+
+                <button type="button" id="btnGuardarWalkin" class="btn btn-gala" style="width:100%; padding:13px; font-size:0.95rem; margin-top:4px;" onclick="guardarRegistroEnPuerta()">
+                    <i class="fa-solid fa-check-circle"></i> Registrar e Ingresar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // URL oficial de Google Apps Script conectada a la hoja de cálculo
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzzy3O0Sz3z0-CLFOUQr_oRgbEotyrLxK04BivdYhqyzp0DM4W5VrwWHabmp19s-sw/exec';
+        const DASHBOARD_PIN = '2026';
+        const PIN_SESSION_KEY = 'cena2026_pin_unlocked';
+
+        // ==================== SEGURIDAD PIN DE ACCESO ====================
+        let currentPinBuffer = '';
+
+        function verificarEstadoPinInicial() {
+            try {
+                if (sessionStorage.getItem(PIN_SESSION_KEY) === 'true') {
+                    document.getElementById('pinLockOverlay').classList.add('unlocked');
+                }
+            } catch (e) {}
+        }
+
+        function actualizarPuntosPin(esError = false) {
+            const dots = document.querySelectorAll('#pinDotsRow .pin-dot');
+            dots.forEach((dot, idx) => {
+                dot.classList.remove('filled', 'error');
+                if (esError) dot.classList.add('error');
+                else if (idx < currentPinBuffer.length) dot.classList.add('filled');
+            });
+        }
+
+        function ingresarDigitoPin(digito) {
+            if (currentPinBuffer.length >= 4) return;
+            document.getElementById('pinErrorMsg').innerText = '';
+            currentPinBuffer += digito;
+            actualizarPuntosPin(false);
+
+            if (currentPinBuffer.length === 4) {
+                if (currentPinBuffer === DASHBOARD_PIN) {
+                    try { sessionStorage.setItem(PIN_SESSION_KEY, 'true'); } catch (e) {}
+                    setTimeout(() => {
+                        document.getElementById('pinLockOverlay').classList.add('unlocked');
+                        currentPinBuffer = '';
+                        actualizarPuntosPin(false);
+                    }, 150);
+                } else {
+                    actualizarPuntosPin(true);
+                    document.getElementById('pinErrorMsg').innerText = 'PIN incorrecto. Intenta nuevamente.';
+                    setTimeout(() => {
+                        currentPinBuffer = '';
+                        actualizarPuntosPin(false);
+                    }, 650);
+                }
+            }
+        }
+
+        function borrarDigitoPin() {
+            currentPinBuffer = currentPinBuffer.slice(0, -1);
+            document.getElementById('pinErrorMsg').innerText = '';
+            actualizarPuntosPin(false);
+        }
+
+        function limpiarPin() {
+            currentPinBuffer = '';
+            document.getElementById('pinErrorMsg').innerText = '';
+            actualizarPuntosPin(false);
+        }
+
+        function bloquearDashboard() {
+            try { sessionStorage.removeItem(PIN_SESSION_KEY); } catch (e) {}
+            currentPinBuffer = '';
+            actualizarPuntosPin(false);
+            document.getElementById('pinLockOverlay').classList.remove('unlocked');
+        }
+
+        document.addEventListener('keydown', (e) => {
+            const overlay = document.getElementById('pinLockOverlay');
+            if (!overlay || overlay.classList.contains('unlocked')) return;
+            if (/^[0-9]$/.test(e.key)) {
+                ingresarDigitoPin(e.key);
+            } else if (e.key === 'Backspace') {
+                borrarDigitoPin();
+            }
+        });
+
+        verificarEstadoPinInicial();
+
+        const VALOR_ADULTO = 5000;
+        const VALOR_NINO = 3000;
+        const CHECKIN_STORAGE_KEY = 'cena2026_checkin_v1';
+        const PAYMENT_STORAGE_KEY = 'cena2026_pagos_v1';
+        const NO_ATTEND_STORAGE_KEY = 'cena2026_no_asiste_v1';
+
+        let personasUnificadas = [];
+        let gruposFamiliares = [];
+        let vistaTablaActual = 'unificado';
+        let quickFilterActual = 'all';
+        let selectedPersonKey = null;
+        let checkinFilterActual = 'todos';
+        let payFilterActual = 'todos';
+        let expandedFamilies = {};
+
+        let checkinMap = {};
+        let paymentMap = {};
+        let noAttendMap = {};
+
+        try {
+            checkinMap = JSON.parse(localStorage.getItem(CHECKIN_STORAGE_KEY) || '{}');
+            paymentMap = JSON.parse(localStorage.getItem(PAYMENT_STORAGE_KEY) || '{}');
+            noAttendMap = JSON.parse(localStorage.getItem(NO_ATTEND_STORAGE_KEY) || '{}');
+        } catch (e) {
+            checkinMap = {};
+            paymentMap = {};
+            noAttendMap = {};
+        }
+
+        let chartTramosInst = null;
+        let chartPagosInst = null;
+        let chartEnsaladasInst = null;
+
+        function formatearCLP(monto) {
+            return '$' + Number(monto || 0).toLocaleString('es-CL');
+        }
+
+        function mostrarEstado(texto, esError = false) {
+            const banner = document.getElementById('statusBanner');
+            const span = document.getElementById('statusText');
+            if (!banner || !span) return;
+            banner.classList.remove('hidden', 'error');
+            if (esError) banner.classList.add('error');
+            span.innerText = texto;
+            if (!esError) {
+                setTimeout(() => banner.classList.add('hidden'), 3500);
+            }
+        }
+
+        function setCloudSyncStatus(estado, texto) {
+            const badge = document.getElementById('cloudSyncBadge');
+            if (!badge) return;
+            if (estado === 'syncing') {
+                badge.style.background = '#fef3c7';
+                badge.style.color = '#92400e';
+                badge.innerHTML = `<i class="fa-solid fa-cloud-arrow-up fa-fade"></i> ${texto || 'Sincronizando...'}`;
+            } else if (estado === 'ok') {
+                badge.style.background = '#dcfce7';
+                badge.style.color = '#15803d';
+                badge.innerHTML = `<i class="fa-solid fa-cloud-check"></i> ${texto || 'Nube sincronizada ✓'}`;
+            } else {
+                badge.style.background = 'rgba(212,175,55,0.22)';
+                badge.style.color = 'var(--bordo-primary)';
+                badge.innerHTML = `<i class="fa-solid fa-cloud"></i> ${texto || 'Modo local'}`;
+            }
+        }
+
+        async function sincronizarEstadosEnNube(keysArray) {
+            if (!SCRIPT_URL || !keysArray || !keysArray.length) return;
+            setCloudSyncStatus('syncing', 'Sincronizando...');
+            const updates = keysArray.map(k => ({
+                key: k,
+                pagado: !!paymentMap[k],
+                ingreso: !!checkinMap[k],
+                noAsiste: !!noAttendMap[k]
+            }));
+
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'sync_estados',
+                        updates: updates
+                    })
+                });
+                setTimeout(() => setCloudSyncStatus('ok', 'Nube sincronizada ✓'), 500);
+            } catch (err) {
+                console.error('Error sincronizando con Google Sheets:', err);
+                setCloudSyncStatus('local', 'Guardado local');
+            }
+        }
+
+        function calcularTarifaPorEdad(edad) {
+            if (edad === null || edad === undefined || edad === '') return VALOR_ADULTO;
+            const e = Number(edad);
+            if (isNaN(e)) return VALOR_ADULTO;
+            if (e <= 4) return 0;
+            if (e <= 12) return VALOR_NINO;
+            return VALOR_ADULTO;
+        }
+
+        function esNoAsiste(stableKey) {
+            return !!noAttendMap[stableKey];
+        }
+
+        function parsearAcompanantesCena(texto) {
+            if (!texto || typeof texto !== 'string') return [];
+            return texto.split(';').map(item => item.trim()).filter(Boolean).map(parte => {
+                let nombre = parte;
+                let edad = null;
+                const parenIdx = parte.indexOf('(');
+                if (parenIdx !== -1) {
+                    nombre = parte.substring(0, parenIdx).trim();
+                    const detalle = parte.substring(parenIdx + 1, parte.lastIndexOf(')') !== -1 ? parte.lastIndexOf(')') : parte.length);
+                    const edadMatch = detalle.match(/(\d+)\s*años/i);
+                    if (edadMatch) edad = Number(edadMatch[1]);
+                }
+                return { nombre, edad };
+            });
+        }
+
+        function crearWhatsappLink(telefono, nombre, cupon) {
+            if (!telefono) return '<span style="color:#94a3b8;">Sin teléfono</span>';
+            let limpio = String(telefono).replace(/\D/g, '');
+            if (limpio.length === 9 && limpio.startsWith('9')) limpio = '56' + limpio;
+            else if (limpio.length === 8) limpio = '569' + limpio;
+            const texto = encodeURIComponent(`Hola ${nombre}, te escribimos por tu reserva #${cupon} de la Cena de Acción de Gracias 2026: `);
+            return `<a href="https://wa.me/${limpio}?text=${texto}" target="_blank" rel="noopener" class="wa-link" onclick="event.stopPropagation()">
+                        <i class="fa-brands fa-whatsapp"></i> ${telefono}
+                    </a>`;
+        }
+
+        function guardarCheckin(changedKeys = []) {
+            try {
+                localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkinMap));
+            } catch (e) {}
+            actualizarKPIs();
+            renderTabla();
+            renderVistaRecepcion();
+            if (selectedPersonKey) renderFichaPersona();
+            if (changedKeys.length > 0) sincronizarEstadosEnNube(changedKeys);
+        }
+
+        function guardarPagos(changedKeys = []) {
+            try {
+                localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentMap));
+                localStorage.setItem(NO_ATTEND_STORAGE_KEY, JSON.stringify(noAttendMap));
+            } catch (e) {}
+            actualizarKPIs();
+            renderTabla();
+            renderVistaPagos();
+            renderVistaRecepcion();
+            if (selectedPersonKey) renderFichaPersona();
+            if (changedKeys.length > 0) sincronizarEstadosEnNube(changedKeys);
+        }
+
+        function togglePagoVerificado(personKey) {
+            if (noAttendMap[personKey]) return;
+            if (paymentMap[personKey]) delete paymentMap[personKey];
+            else paymentMap[personKey] = true;
+            guardarPagos([personKey]);
+        }
+
+        function toggleNoAsiste(personKey) {
+            if (noAttendMap[personKey]) {
+                delete noAttendMap[personKey];
+            } else {
+                noAttendMap[personKey] = true;
+                delete paymentMap[personKey];
+                delete checkinMap[personKey];
+            }
+            guardarPagos([personKey]);
+        }
+
+        function toggleIngresoPuerta(personKey) {
+            if (noAttendMap[personKey]) return;
+            if (checkinMap[personKey]) delete checkinMap[personKey];
+            else checkinMap[personKey] = true;
+            guardarCheckin([personKey]);
+        }
+
+        function marcarFamiliaCompleta(groupId, marcarComoPagado) {
+            const grupo = gruposFamiliares.find(g => g.groupId === groupId);
+            if (!grupo) return;
+            const keys = [];
+            grupo.miembros.forEach(m => {
+                if (m.valor <= 0 || noAttendMap[m.stableKey]) return;
+                if (marcarComoPagado) paymentMap[m.stableKey] = true;
+                else delete paymentMap[m.stableKey];
+                keys.push(m.stableKey);
+            });
+            guardarPagos(keys);
+        }
+
+        function toggleAcordeonFamilia(groupId) {
+            expandedFamilies[groupId] = !expandedFamilies[groupId];
+            renderVistaPagos();
+        }
+
+        function abrirVistaRecepcion() {
+            document.getElementById('mainDashboardView').classList.add('hidden');
+            document.getElementById('paymentControlView').classList.remove('active');
+            document.getElementById('balanceView').classList.remove('active');
+            document.getElementById('recepcionView').classList.add('active');
+            renderVistaRecepcion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function abrirVistaPagos() {
+            document.getElementById('mainDashboardView').classList.add('hidden');
+            document.getElementById('recepcionView').classList.remove('active');
+            document.getElementById('balanceView').classList.remove('active');
+            document.getElementById('paymentControlView').classList.add('active');
+            renderVistaPagos();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function abrirVistaBalance() {
+            document.getElementById('mainDashboardView').classList.add('hidden');
+            document.getElementById('recepcionView').classList.remove('active');
+            document.getElementById('paymentControlView').classList.remove('active');
+            document.getElementById('balanceView').classList.add('active');
+            actualizarKPIs();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cerrarSubVistas() {
+            document.getElementById('recepcionView').classList.remove('active');
+            document.getElementById('paymentControlView').classList.remove('active');
+            document.getElementById('balanceView').classList.remove('active');
+            document.getElementById('mainDashboardView').classList.remove('hidden');
+        }
+
+        function setCheckinFilter(filtro) {
+            checkinFilterActual = filtro;
+            document.getElementById('checkinFilterTodos').classList.toggle('active', filtro === 'todos');
+            document.getElementById('checkinFilterFaltan').classList.toggle('active', filtro === 'faltan');
+            document.getElementById('checkinFilterDentro').classList.toggle('active', filtro === 'dentro');
+            renderVistaRecepcion();
+        }
+
+        function setPayFilter(filtro) {
+            payFilterActual = filtro;
+            document.getElementById('payFilterTodos').classList.toggle('active', filtro === 'todos');
+            document.getElementById('payFilterPendientes').classList.toggle('active', filtro === 'pendientes');
+            document.getElementById('payFilterPagados').classList.toggle('active', filtro === 'pagados');
+            renderVistaPagos();
+        }
+
+        function abrirModalReset() {
+            document.getElementById('confirmModal').classList.add('show');
+        }
+
+        function cerrarModalReset() {
+            document.getElementById('confirmModal').classList.remove('show');
+        }
+
+        // ==================== LECTOR QR CON CÁMARA (PORTERÍA RÁPIDA + ANTI-REBOTE) ====================
+        let html5QrScanner = null;
+        let qrScannerRunning = false;
+        let lastScannedCode = '';
+        let lastScanTimestamp = 0;
+        let qrTorchOn = false;
+
+        async function abrirEscanerQR() {
+            document.getElementById('qrScannerModal').classList.add('show');
+            document.getElementById('qrScanResultArea').innerHTML = '';
+            document.getElementById('manualQrCodeInput').value = '';
+            lastScannedCode = '';
+            qrTorchOn = false;
+
+            const torchBtn = document.getElementById('btnToggleTorch');
+            if (torchBtn) {
+                torchBtn.style.display = 'none';
+                torchBtn.classList.remove('btn-torch-active');
+            }
+
+            if (typeof Html5Qrcode === 'undefined') {
+                document.getElementById('qrScanResultArea').innerHTML = `
+                    <div class="qr-result-card" style="color:#b91c1c; font-weight:700;">
+                        No se pudo cargar la librería de cámara. Puedes buscar por código arriba.
+                    </div>`;
+                return;
+            }
+
+            try {
+                if (!html5QrScanner) {
+                    html5QrScanner = new Html5Qrcode('qrReaderBox');
+                }
+                if (!qrScannerRunning) {
+                    qrScannerRunning = true;
+                    await html5QrScanner.start(
+                        { facingMode: 'environment' },
+                        { fps: 10, qrbox: { width: 220, height: 220 } },
+                        (decodedText) => {
+                            const ahora = Date.now();
+                            // Evitar lecturas repetidas y sonidos múltiples del mismo QR mientras está en pantalla
+                            if (decodedText === lastScannedCode && (ahora - lastScanTimestamp) < 4500) {
+                                return;
+                            }
+                            lastScannedCode = decodedText;
+                            lastScanTimestamp = ahora;
+                            procesarTextoQR(decodedText);
+                        },
+                        () => {}
+                    );
+
+                    // Mostrar botón de linterna si la cámara del teléfono lo soporta
+                    try {
+                        const caps = html5QrScanner.getRunningTrackCameraCapabilities();
+                        if (caps && caps.torchFeature && caps.torchFeature().isSupported() && torchBtn) {
+                            torchBtn.style.display = 'inline-flex';
+                        }
+                    } catch (e) {}
+                }
+            } catch (err) {
+                qrScannerRunning = false;
+                document.getElementById('qrScanResultArea').innerHTML = `
+                    <div class="qr-result-card" style="font-size:0.84rem; color:var(--bordo-primary); font-weight:600;">
+                        <i class="fa-solid fa-camera-slash" style="color:#b45309;"></i> No se pudo acceder a la cámara (verifica permisos HTTPS). Puedes escribir el código <strong>AG-XXXX</strong> arriba.
+                    </div>`;
+            }
+        }
+
+        async function toggleLinternaQR() {
+            if (!html5QrScanner || !qrScannerRunning) return;
+            try {
+                const caps = html5QrScanner.getRunningTrackCameraCapabilities();
+                if (caps && caps.torchFeature && caps.torchFeature().isSupported()) {
+                    qrTorchOn = !qrTorchOn;
+                    await caps.torchFeature().apply(qrTorchOn);
+                    const torchBtn = document.getElementById('btnToggleTorch');
+                    if (torchBtn) torchBtn.classList.toggle('btn-torch-active', qrTorchOn);
+                }
+            } catch (e) {}
+        }
+
+        function siguientePaseQR() {
+            lastScannedCode = '';
+            lastScanTimestamp = 0;
+            document.getElementById('manualQrCodeInput').value = '';
+            document.getElementById('qrScanResultArea').innerHTML = `
+                <div style="text-align:center; padding:12px; font-size:0.82rem; font-weight:700; color:var(--gold-dark);">
+                    <i class="fa-solid fa-camera"></i> Cámara lista para el siguiente ticket...
+                </div>
+            `;
+        }
+
+        async function cerrarEscanerQR(event) {
+            if (event && event.target !== document.getElementById('qrScannerModal')) return;
+            document.getElementById('qrScannerModal').classList.remove('show');
+            lastScannedCode = '';
+            qrTorchOn = false;
+            if (html5QrScanner && qrScannerRunning) {
+                try {
+                    await html5QrScanner.stop();
+                } catch (e) {}
+                qrScannerRunning = false;
+            }
+        }
+
+        function buscarCodigoManualQR() {
+            const val = document.getElementById('manualQrCodeInput').value.trim();
+            if (!val) return;
+            lastScannedCode = val;
+            lastScanTimestamp = Date.now();
+            procesarTextoQR(val);
+        }
+
+        function procesarTextoQR(rawText, silencioso = false) {
+            // Formato generado por el cupón: CENA-AG2026|AG-XXXX|Nombre|CUPOS:X|TOTAL:$XXXX
+            let codigoBuscado = rawText.replace(/#/g, '').trim().toUpperCase();
+            let nombreFallback = '';
+            let cuposFallback = '';
+            let totalFallback = '';
+
+            if (rawText.includes('|')) {
+                const partes = rawText.split('|');
+                codigoBuscado = (partes[1] || '').replace(/#/g, '').trim().toUpperCase();
+                nombreFallback = (partes[2] || '').trim();
+                cuposFallback = (partes[3] || '').replace('CUPOS:', '').trim();
+                totalFallback = (partes[4] || '').replace('TOTAL:', '').trim();
+            } else if (!codigoBuscado.startsWith('AG-') && /^\d{4}$/.test(codigoBuscado)) {
+                codigoBuscado = 'AG-' + codigoBuscado;
+            }
+
+            // Reproducir un único bip y vibración breve solo cuando es una lectura nueva
+            if (!silencioso) {
+                try {
+                    if (navigator.vibrate) navigator.vibrate(90);
+                    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                    const osc = audioCtx.createOscillator();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(880, audioCtx.currentTime);
+                    osc.connect(audioCtx.destination);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.12);
+                } catch (e) {}
+            }
+
+            const grupo = gruposFamiliares.find(g => g.codigoCupon.replace(/#/g, '').trim().toUpperCase() === codigoBuscado);
+            const resultArea = document.getElementById('qrScanResultArea');
+
+            if (!grupo) {
+                resultArea.innerHTML = `
+                    <div class="qr-result-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span class="badge badge-bordo">${codigoBuscado || 'QR Leído'}</span>
+                            <span class="badge badge-green">Pase VIP Válido ✓</span>
+                        </div>
+                        ${nombreFallback ? `<div style="font-family:'Cormorant Garamond', serif; font-weight:700; color:var(--bordo-primary); font-size:1.3rem; margin-top:6px;">${nombreFallback}</div>` : ''}
+                        ${cuposFallback ? `<div style="font-size:0.84rem; color:var(--text-dark); font-weight:700; margin-top:2px;">Cupos: ${cuposFallback} · Total: ${totalFallback}</div>` : ''}
+                        <div style="font-size:0.78rem; color:var(--text-muted); margin-top:6px;">
+                            Si aún no aparece en la tabla, actualiza la planilla para sincronizar los últimos registros.
+                        </div>
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                            <button type="button" class="btn btn-gold" onclick="cargarDatos(false)">
+                                <i class="fa-solid fa-rotate"></i> Sincronizar
+                            </button>
+                            <button type="button" class="btn" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            const activos = grupo.miembros.filter(m => !esNoAsiste(m.stableKey));
+            const totalMesa = activos.reduce((s, m) => s + m.valor, 0);
+            const pagadoMesa = activos.filter(m => m.valor > 0 && paymentMap[m.stableKey]).reduce((s, m) => s + m.valor, 0);
+            const pagadoCompleto = pagadoMesa >= totalMesa;
+
+            // Si es una sola persona: ingreso directo + botón "Siguiente Pase" para portería rápida
+            if (activos.length === 1) {
+                const unico = activos[0];
+                const yaIngreso = !!checkinMap[unico.stableKey];
+                resultArea.innerHTML = `
+                    <div class="qr-result-card">
+                        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                            <span class="badge badge-bordo">${grupo.codigoCupon}</span>
+                            <span class="badge ${pagadoCompleto ? 'badge-green' : 'badge-amber'}">
+                                ${pagadoCompleto ? `Pagado ✓ (${formatearCLP(totalMesa)})` : `Pendiente: ${formatearCLP(totalMesa - pagadoMesa)}`}
+                            </span>
+                        </div>
+
+                        <div style="font-family:'Cormorant Garamond', serif; font-size:1.35rem; font-weight:700; color:var(--bordo-primary); margin-top:6px;">
+                            ${unico.nombre}
+                        </div>
+                        ${grupo.ensalada ? `<div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; margin-bottom:6px;">🥗 Ensalada: ${grupo.ensalada}</div>` : ''}
+
+                        <div style="display:flex; justify-content:space-between; font-size:0.84rem; padding:6px 0; border-bottom:1px dashed rgba(212,175,55,0.3);">
+                            <span><strong>${unico.nombre}</strong> (Titular)</span>
+                            <span style="font-weight:800; color:${yaIngreso ? '#15803d' : '#b45309'};">${yaIngreso ? 'En salón ✓' : 'Por ingresar'}</span>
+                        </div>
+
+                        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                            <button type="button" class="btn btn-gala" style="padding:10px; font-size:0.82rem;" onclick="darIngresoMesaQR('${grupo.groupId}')">
+                                <i class="fa-solid fa-champagne-glasses"></i> ${yaIngreso ? 'En Salón ✓' : 'Confirmar Ingreso'}
+                            </button>
+                            ${!pagadoCompleto ? `
+                                <button type="button" class="btn btn-gold" style="padding:10px; font-size:0.82rem;" onclick="pagarMesaDesdeQR('${grupo.groupId}')">
+                                    <i class="fa-solid fa-check-double"></i> Marcar Pagado
+                                </button>
+                            ` : `
+                                <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="siguientePaseQR()">
+                                    <i class="fa-solid fa-forward"></i> Siguiente Pase
+                                </button>
+                            `}
+                        </div>
+                        ${!pagadoCompleto ? `
+                            <button type="button" class="btn" style="width:100%; margin-top:8px; padding:8px; font-size:0.8rem;" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
+                            </button>
+                        ` : ''}
+                    </div>
+                `;
+                return;
+            }
+
+            // Si hay más de 1 persona en la mesa: mantiene abierta la selección individual sin avanzar automático
+            const listaInvitadosHTML = activos.map(m => {
+                const ing = !!checkinMap[m.stableKey];
+                const safeKey = m.stableKey.replace(/'/g, "\\'");
+                return `
+                    <label style="display:flex; justify-content:space-between; align-items:center; gap:8px; font-size:0.84rem; padding:8px 10px; margin-top:6px; border-radius:11px; border:1.5px solid ${ing ? '#16a34a' : 'rgba(212,175,55,0.45)'}; background:${ing ? '#f0fdf4' : '#fffdf9'}; cursor:pointer; user-select:none;">
+                        <span style="display:flex; align-items:center; gap:9px;">
+                            <input type="checkbox" class="qr-guest-check" data-key="${safeKey}" ${ing ? 'checked' : ''} onchange="actualizarContadorSeleccionQR()" style="width:18px; height:18px; accent-color:#5e0b1f; cursor:pointer;">
+                            <span>
+                                <strong style="color:var(--bordo-primary);">${m.nombre}</strong>
+                                <span style="font-size:0.75rem; color:var(--text-muted);">(${m.rol})</span>
+                            </span>
+                        </span>
+                        <span style="font-size:0.74rem; font-weight:800; color:${ing ? '#15803d' : '#b45309'};">
+                            ${ing ? 'En salón ✓' : 'Por ingresar'}
+                        </span>
+                    </label>
+                `;
+            }).join('');
+
+            const yaIngresadosCount = activos.filter(m => checkinMap[m.stableKey]).length;
+
+            resultArea.innerHTML = `
+                <div class="qr-result-card">
+                    <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px;">
+                        <span class="badge badge-bordo">${grupo.codigoCupon}</span>
+                        <span class="badge ${pagadoCompleto ? 'badge-green' : 'badge-amber'}">
+                            ${pagadoCompleto ? `Pagado ✓ (${formatearCLP(totalMesa)})` : `Pendiente: ${formatearCLP(totalMesa - pagadoMesa)}`}
+                        </span>
+                    </div>
+
+                    <div style="font-family:'Cormorant Garamond', serif; font-size:1.35rem; font-weight:700; color:var(--bordo-primary); margin-top:6px;">
+                        Mesa ${grupo.titular}
+                    </div>
+                    ${grupo.ensalada ? `<div style="font-size:0.8rem; color:var(--text-muted); font-weight:700; margin-bottom:4px;">🥗 Ensalada: ${grupo.ensalada}</div>` : ''}
+
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:8px; padding-top:6px; border-top:1px dashed rgba(212,175,55,0.4);">
+                        <span id="qrSelectedCountLabel" style="font-size:0.78rem; font-weight:800; color:var(--bordo-primary);">
+                            Seleccionados: ${yaIngresadosCount} de ${activos.length} personas
+                        </span>
+                        <button type="button" onclick="toggleTodosCheckboxesQR()" style="background:none; border:none; color:var(--gold-dark); font-size:0.76rem; font-weight:800; cursor:pointer; text-decoration:underline;">
+                            Marcar / Desmarcar todos
+                        </button>
+                    </div>
+
+                    <div style="margin:4px 0 10px;">${listaInvitadosHTML}</div>
+
+                    <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-top:10px;">
+                        <button type="button" id="btnConfirmarSeleccionQR" class="btn btn-gala" style="padding:10px; font-size:0.82rem;" onclick="confirmarSeleccionMesaQR('${grupo.groupId}')">
+                            <i class="fa-solid fa-champagne-glasses"></i> Ingresar (${yaIngresadosCount})
+                        </button>
+                        ${!pagadoCompleto ? `
+                            <button type="button" class="btn btn-gold" style="padding:10px; font-size:0.82rem;" onclick="pagarMesaDesdeQR('${grupo.groupId}')">
+                                <i class="fa-solid fa-check-double"></i> Marcar Pagado
+                            </button>
+                        ` : `
+                            <button type="button" class="btn" style="padding:10px; font-size:0.82rem;" onclick="siguientePaseQR()">
+                                <i class="fa-solid fa-forward"></i> Siguiente Pase
+                            </button>
+                        `}
+                    </div>
+                    ${!pagadoCompleto ? `
+                        <button type="button" class="btn" style="width:100%; margin-top:8px; padding:8px; font-size:0.8rem;" onclick="siguientePaseQR()">
+                            <i class="fa-solid fa-forward"></i> Siguiente Pase
+                        </button>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        function actualizarContadorSeleccionQR() {
+            const boxes = document.querySelectorAll('#qrScanResultArea .qr-guest-check');
+            const total = boxes.length;
+            const checked = Array.from(boxes).filter(b => b.checked).length;
+
+            const label = document.getElementById('qrSelectedCountLabel');
+            if (label) {
+                label.innerText = `Seleccionados: ${checked} de ${total} personas`;
+            }
+            const btn = document.getElementById('btnConfirmarSeleccionQR');
+            if (btn) {
+                btn.innerHTML = `<i class="fa-solid fa-champagne-glasses"></i> Ingresar (${checked})`;
+            }
+        }
+
+        function toggleTodosCheckboxesQR() {
+            const boxes = Array.from(document.querySelectorAll('#qrScanResultArea .qr-guest-check'));
+            if (!boxes.length) return;
+            const todosMarcados = boxes.every(b => b.checked);
+            boxes.forEach(b => { b.checked = !todosMarcados; });
+            actualizarContadorSeleccionQR();
+        }
+
+        function confirmarSeleccionMesaQR(groupId) {
+            const grupo = gruposFamiliares.find(g => g.groupId === groupId);
+            if (!grupo) return;
+            const boxes = document.querySelectorAll('#qrScanResultArea .qr-guest-check');
+            const changedKeys = [];
+
+            boxes.forEach(box => {
+                const key = box.getAttribute('data-key');
+                if (!key) return;
+                if (box.checked && !checkinMap[key]) {
+                    checkinMap[key] = true;
+                    changedKeys.push(key);
+                } else if (!box.checked && checkinMap[key]) {
+                    delete checkinMap[key];
+                    changedKeys.push(key);
+                }
+            });
+
+            guardarCheckin(changedKeys);
+            // Mantiene abierta la tarjeta de grupo sin sonar de nuevo ni saltar de ticket
+            procesarTextoQR(grupo.codigoCupon, true);
+        }
+
+        function darIngresoMesaQR(groupId) {
+            const grupo = gruposFamiliares.find(g => g.groupId === groupId);
+            if (!grupo) return;
+            const keys = [];
+            grupo.miembros.forEach(m => {
+                if (!esNoAsiste(m.stableKey)) {
+                    checkinMap[m.stableKey] = true;
+                    keys.push(m.stableKey);
+                }
+            });
+            guardarCheckin(keys);
+            procesarTextoQR(grupo.codigoCupon, true);
+        }
+
+        function pagarMesaDesdeQR(groupId) {
+            marcarFamiliaCompleta(groupId, true);
+            const grupo = gruposFamiliares.find(g => g.groupId === groupId);
+            if (grupo) procesarTextoQR(grupo.codigoCupon, true);
+        }
+
+        // ==================== REGISTRO PRESENCIAL EN PUERTA (WALK-IN) ====================
+        let walkinAcompanantes = [];
+
+        function abrirModalWalkin() {
+            walkinAcompanantes = [];
+            document.getElementById('walkinNombre').value = '';
+            document.getElementById('walkinTelefono').value = '';
+            document.getElementById('walkinEnsalada').value = '';
+            document.getElementById('walkinMarcarPagado').checked = true;
+            document.getElementById('walkinMarcarIngreso').checked = true;
+            renderWalkinAcompanantes();
+            document.getElementById('walkinModal').classList.add('show');
+            setTimeout(() => document.getElementById('walkinNombre').focus(), 100);
+        }
+
+        function cerrarModalWalkin(event) {
+            if (event && event.target !== document.getElementById('walkinModal')) return;
+            document.getElementById('walkinModal').classList.remove('show');
+        }
+
+        function agregarAcompWalkin() {
+            walkinAcompanantes.push({ id: Date.now() + Math.random(), nombre: '', edad: '' });
+            renderWalkinAcompanantes();
+        }
+
+        function quitarAcompWalkin(id) {
+            walkinAcompanantes = walkinAcompanantes.filter(a => a.id !== id);
+            renderWalkinAcompanantes();
+        }
+
+        function actualizarAcompWalkin(id, campo, valor) {
+            const item = walkinAcompanantes.find(a => a.id === id);
+            if (item) item[campo] = valor;
+            actualizarTotalesWalkin();
+        }
+
+        function actualizarTotalesWalkin() {
+            let totalPersonas = 1 + walkinAcompanantes.length;
+            let totalMonto = VALOR_ADULTO;
+            walkinAcompanantes.forEach(a => {
+                totalMonto += calcularTarifaPorEdad(a.edad);
+            });
+            document.getElementById('walkinResumenCupos').innerText = `Total: ${totalPersonas} persona(s)`;
+            document.getElementById('walkinResumenMonto').innerText = formatearCLP(totalMonto);
+        }
+
+        function renderWalkinAcompanantes() {
+            const list = document.getElementById('walkinAcompList');
+            if (!walkinAcompanantes.length) {
+                list.innerHTML = `<div style="font-size:0.78rem; color:var(--text-muted);">Solo titular (pulsa "+ Agregar" si viene acompañado).</div>`;
+            } else {
+                list.innerHTML = walkinAcompanantes.map((a, idx) => `
+                    <div style="display:grid; grid-template-columns:1fr 78px 32px; gap:6px; align-items:center;">
+                        <input type="text" class="walkin-input" style="padding:8px 10px; font-size:0.84rem;" placeholder="Nombre acomp. #${idx + 1}" value="${a.nombre}" oninput="actualizarAcompWalkin(${a.id}, 'nombre', this.value)">
+                        <input type="number" class="walkin-input" style="padding:8px 8px; font-size:0.84rem;" min="0" max="110" placeholder="Edad" value="${a.edad}" oninput="actualizarAcompWalkin(${a.id}, 'edad', this.value)">
+                        <button type="button" onclick="quitarAcompWalkin(${a.id})" style="background:#fee2e2; color:#b91c1c; border:none; border-radius:10px; height:36px; cursor:pointer;">
+                            <i class="fa-solid fa-trash"></i>
+                        </button>
+                    </div>
+                `).join('');
+            }
+            actualizarTotalesWalkin();
+        }
+
+        async function guardarRegistroEnPuerta() {
+            const nombreTitular = document.getElementById('walkinNombre').value.trim();
+            if (!nombreTitular) {
+                mostrarEstado('Escribe el nombre del invitado para registrarlo en puerta.', true);
+                return;
+            }
+
+            for (let i = 0; i < walkinAcompanantes.length; i++) {
+                if (!walkinAcompanantes[i].nombre.trim()) {
+                    mostrarEstado(`Escribe el nombre del acompañante #${i + 1}.`, true);
+                    return;
+                }
+            }
+
+            const telefono = document.getElementById('walkinTelefono').value.trim();
+            const ensalada = document.getElementById('walkinEnsalada').value.trim();
+            const marcarPagado = document.getElementById('walkinMarcarPagado').checked;
+            const marcarIngreso = document.getElementById('walkinMarcarIngreso').checked;
+
+            const codigoCupon = 'AG-' + Math.floor(1000 + Math.random() * 9000);
+            const idx = gruposFamiliares.length;
+            const groupId = `mesa_${idx}_${codigoCupon}`;
+            const fechaStr = new Date().toLocaleDateString('es-CL');
+
+            let totalMonto = VALOR_ADULTO;
+            const acompanantesTexto = walkinAcompanantes.map(a => {
+                const edadNum = a.edad !== '' ? Number(a.edad) : null;
+                const val = calcularTarifaPorEdad(edadNum);
+                totalMonto += val;
+                const tarifaTxt = val === 0 ? 'Gratis' : formatearCLP(val);
+                return edadNum !== null ? `${a.nombre.trim()} (${edadNum} años · ${tarifaTxt})` : `${a.nombre.trim()} (${tarifaTxt})`;
+            }).join('; ');
+
+            const miembrosGrupo = [];
+            const keysCreadas = [];
+
+            const objTitular = {
+                stableKey: `${codigoCupon}_Titular_${idx}`,
+                groupId,
+                codigoCupon,
+                nombre: nombreTitular,
+                edad: null,
+                valor: VALOR_ADULTO,
+                rol: 'Titular',
+                titularGrupo: nombreTitular,
+                telefono,
+                ensalada,
+                fecha: fechaStr
+            };
+            personasUnificadas.push(objTitular);
+            miembrosGrupo.push(objTitular);
+            keysCreadas.push(objTitular.stableKey);
+
+            walkinAcompanantes.forEach((a, aIdx) => {
+                const edadNum = a.edad !== '' ? Number(a.edad) : null;
+                const val = calcularTarifaPorEdad(edadNum);
+                const objAcomp = {
+                    stableKey: `${codigoCupon}_Acomp_${aIdx}_${a.nombre.trim()}`,
+                    groupId,
+                    codigoCupon,
+                    nombre: a.nombre.trim(),
+                    edad: edadNum,
+                    valor: val,
+                    rol: 'Acompañante',
+                    titularGrupo: nombreTitular,
+                    telefono,
+                    ensalada,
+                    fecha: fechaStr
+                };
+                personasUnificadas.push(objAcomp);
+                miembrosGrupo.push(objAcomp);
+                keysCreadas.push(objAcomp.stableKey);
+            });
+
+            gruposFamiliares.push({
+                groupId,
+                codigoCupon,
+                titular: nombreTitular,
+                telefono,
+                ensalada,
+                fecha: fechaStr,
+                miembros: miembrosGrupo
+            });
+
+            miembrosGrupo.forEach(m => {
+                if (marcarPagado && m.valor > 0) paymentMap[m.stableKey] = true;
+                if (marcarIngreso) checkinMap[m.stableKey] = true;
+            });
+
+            try {
+                localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentMap));
+                localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkinMap));
+            } catch (e) {}
+
+            actualizarKPIs();
+            renderTabla();
+            renderVistaRecepcion();
+            renderVistaPagos();
+            cerrarModalWalkin();
+            mostrarEstado(`¡Registrado en puerta! Pase #${codigoCupon} (${nombreTitular}) agregado.`, false);
+
+            // Guardar fila y estados en Google Sheets en segundo plano
+            if (SCRIPT_URL) {
+                fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        codigoCupon,
+                        nombre: nombreTitular,
+                        telefono,
+                        enGrupo: walkinAcompanantes.length > 0 ? 'Sí' : 'No',
+                        acompanantes: acompanantesTexto,
+                        totalCupos: miembrosGrupo.length,
+                        totalMonto,
+                        mensaje: ensalada
+                    })
+                }).then(() => sincronizarEstadosEnNube(keysCreadas)).catch(() => {});
+            }
+        }
+
+        function confirmarResetCheckin() {
+            const keys = Object.keys(checkinMap);
+            checkinMap = {};
+            guardarCheckin(keys);
+            cerrarModalReset();
+            mostrarEstado('Registro de puerta reiniciado.', false);
+        }
+
+        function renderVistaRecepcion() {
+            const activos = personasUnificadas.filter(p => !esNoAsiste(p.stableKey));
+            const total = activos.length;
+            const dentro = activos.filter(p => checkinMap[p.stableKey]).length;
+            const pct = total > 0 ? Math.round((dentro / total) * 100) : 0;
+
+            document.getElementById('checkinCounterText').innerText = `${dentro} de ${total} invitados en el salón`;
+            document.getElementById('checkinPercentText').innerText = `${pct}%`;
+            document.getElementById('checkinProgressFill').style.width = `${pct}%`;
+
+            const query = (document.getElementById('checkinSearchInput').value || '').toLowerCase().trim();
+            const filtrados = activos.filter(p => {
+                const match = p.nombre.toLowerCase().includes(query) ||
+                    p.titularGrupo.toLowerCase().includes(query) ||
+                    p.codigoCupon.toLowerCase().includes(query);
+                if (!match) return false;
+                const ok = !!checkinMap[p.stableKey];
+                if (checkinFilterActual === 'faltan') return !ok;
+                if (checkinFilterActual === 'dentro') return ok;
+                return true;
+            });
+
+            const container = document.getElementById('checkinChecklistContainer');
+            if (!filtrados.length) {
+                container.innerHTML = `<div class="checkin-card" style="grid-column:1/-1; justify-content:center; cursor:default; color:var(--text-muted); font-weight:700;">
+                    No hay invitados en esta categoría.
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filtrados.map(p => {
+                const checked = !!checkinMap[p.stableKey];
+                const pagadoBadge = p.valor === 0
+                    ? '<span class="badge badge-gold">Gratis</span>'
+                    : (paymentMap[p.stableKey] ? '<span class="badge badge-green">Pagado ✓</span>' : `<span class="badge badge-amber">Debe ${formatearCLP(p.valor)}</span>`);
+
+                return `
+                    <div class="checkin-card ${checked ? 'checked' : ''}" onclick="toggleIngresoPuerta('${p.stableKey.replace(/'/g, "\\'")}')">
+                        <div class="checkin-box"><i class="fa-solid fa-check"></i></div>
+                        <div style="flex:1;">
+                            <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">
+                                <span style="font-weight:800; color:var(--bordo-primary); font-size:0.96rem;">${p.nombre}</span>
+                                <span class="badge badge-bordo">${p.codigoCupon}</span>
+                            </div>
+                            <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600; margin-top:3px;">
+                                ${p.rol} · Reserva: ${p.titularGrupo}
+                            </div>
+                        </div>
+                        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:4px;">
+                            ${pagadoBadge}
+                            <span class="badge ${checked ? 'badge-green' : 'badge-gray'}">${checked ? 'En salón ✓' : 'Pendiente'}</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function renderVistaPagos() {
+            let esperado = 0;
+            let recaudado = 0;
+
+            personasUnificadas.forEach(p => {
+                if (p.valor > 0 && !esNoAsiste(p.stableKey)) {
+                    esperado += p.valor;
+                    if (paymentMap[p.stableKey]) recaudado += p.valor;
+                }
+            });
+
+            const pendiente = Math.max(0, esperado - recaudado);
+            const pct = esperado > 0 ? Math.round((recaudado / esperado) * 100) : 0;
+
+            document.getElementById('payAmountCollected').innerText = formatearCLP(recaudado);
+            document.getElementById('payAmountPending').innerText = formatearCLP(pendiente);
+            document.getElementById('payAmountExpected').innerText = formatearCLP(esperado);
+            document.getElementById('payCounterText').innerText = `${formatearCLP(recaudado)} de ${formatearCLP(esperado)} recaudados`;
+            document.getElementById('payPercentText').innerText = `${pct}%`;
+            document.getElementById('payProgressFill').style.width = `${pct}%`;
+
+            const query = (document.getElementById('paySearchInput').value || '').toLowerCase().trim();
+            const container = document.getElementById('payFamiliesContainer');
+
+            const filtradas = gruposFamiliares.filter(g => {
+                const match = g.titular.toLowerCase().includes(query) ||
+                    g.codigoCupon.toLowerCase().includes(query) ||
+                    (g.telefono && String(g.telefono).toLowerCase().includes(query)) ||
+                    g.miembros.some(m => m.nombre.toLowerCase().includes(query));
+                if (!match) return false;
+
+                const pagan = g.miembros.filter(m => m.valor > 0 && !esNoAsiste(m.stableKey));
+                const pagados = pagan.filter(m => paymentMap[m.stableKey]);
+                const alDia = pagan.length === pagados.length;
+
+                if (payFilterActual === 'pendientes') return !alDia;
+                if (payFilterActual === 'pagados') return alDia;
+                return true;
+            });
+
+            if (!filtradas.length) {
+                container.innerHTML = `<div class="sub-header-card" style="text-align:center; color:var(--text-muted); font-weight:700;">
+                    No hay reservas que coincidan con este filtro.
+                </div>`;
+                return;
+            }
+
+            container.innerHTML = filtradas.map(g => {
+                const isExpanded = !!expandedFamilies[g.groupId];
+                const pagan = g.miembros.filter(m => m.valor > 0 && !esNoAsiste(m.stableKey));
+                const pagados = pagan.filter(m => paymentMap[m.stableKey]);
+
+                const totalGrupo = pagan.reduce((acc, m) => acc + m.valor, 0);
+                const pagadoGrupo = pagados.reduce((acc, m) => acc + m.valor, 0);
+                const pendienteGrupo = Math.max(0, totalGrupo - pagadoGrupo);
+                const completa = pagan.length === pagados.length;
+
+                const miembrosHTML = g.miembros.map(m => {
+                    const safeKey = m.stableKey.replace(/'/g, "\\'");
+                    const ausente = esNoAsiste(m.stableKey);
+                    const edadTxt = m.edad !== null ? `${m.edad} años` : 'Adulto';
+
+                    if (ausente) {
+                        return `
+                            <div class="pay-member-row member-absent">
+                                <div>
+                                    <div style="font-weight:800; color:#991b1b; text-decoration:line-through;">${m.nombre}</div>
+                                    <div style="font-size:0.78rem; color:#b91c1c; font-weight:700;">${m.rol} · ${edadTxt} · No asiste ($0)</div>
+                                </div>
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <span class="badge badge-red">Descontado</span>
+                                    <button type="button" class="absent-check-trigger active" onclick="toggleNoAsiste('${safeKey}')">
+                                        <i class="fa-solid fa-check-square"></i> No asiste
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    if (m.valor === 0) {
+                        return `
+                            <div class="pay-member-row">
+                                <div>
+                                    <div style="font-weight:800; color:var(--bordo-primary);">${m.nombre}</div>
+                                    <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600;">${m.rol} · ${edadTxt} (Hasta 4 años)</div>
+                                </div>
+                                <div style="display:flex; gap:8px; align-items:center;">
+                                    <span class="badge badge-gold"><i class="fa-solid fa-gift"></i> Gratis ($0)</span>
+                                    <button type="button" class="absent-check-trigger" onclick="toggleNoAsiste('${safeKey}')">
+                                        <i class="fa-regular fa-square"></i> No asiste
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }
+
+                    const pagado = !!paymentMap[m.stableKey];
+                    return `
+                        <div class="pay-member-row ${pagado ? 'member-paid' : ''}">
+                            <div>
+                                <div style="font-weight:800; color:var(--bordo-primary);">${m.nombre}</div>
+                                <div style="font-size:0.78rem; color:var(--text-muted); font-weight:600;">
+                                    ${m.rol} · ${edadTxt} · Adhesión: <strong>${formatearCLP(m.valor)}</strong>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+                                <button type="button" class="pay-check-trigger ${pagado ? 'active' : ''}" onclick="togglePagoVerificado('${safeKey}')">
+                                    <i class="fa-solid ${pagado ? 'fa-square-check' : 'fa-square'}"></i>
+                                    ${pagado ? `Pagado ✓ (${formatearCLP(m.valor)})` : `Marcar Pagado (${formatearCLP(m.valor)})`}
+                                </button>
+                                <button type="button" class="absent-check-trigger" onclick="toggleNoAsiste('${safeKey}')">
+                                    <i class="fa-regular fa-square"></i> No asiste
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="pay-family-card ${completa ? 'family-complete' : ''} ${isExpanded ? 'expanded' : ''}">
+                        <div class="pay-family-header" onclick="toggleAcordeonFamilia('${g.groupId}')">
+                            <div>
+                                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                                    <i class="fa-solid ${isExpanded ? 'fa-chevron-down' : 'fa-chevron-right'}" style="color:var(--gold-dark);"></i>
+                                    <span style="font-family:'Cormorant Garamond', serif; font-weight:700; font-size:1.25rem; color:var(--bordo-primary);">
+                                        Mesa ${g.titular}
+                                    </span>
+                                    <span class="badge badge-bordo">${g.codigoCupon}</span>
+                                    <span class="badge badge-gray">${g.miembros.length} cupo(s)</span>
+                                    ${completa
+                                        ? `<span class="badge badge-green"><i class="fa-solid fa-circle-check"></i> Pagado (${formatearCLP(totalGrupo)})</span>`
+                                        : `<span class="badge badge-amber">Pendiente: ${formatearCLP(pendienteGrupo)}</span>`
+                                    }
+                                </div>
+                                <div style="font-size:0.82rem; color:var(--text-muted); font-weight:600; margin-top:4px; margin-left:20px;">
+                                    Pagado: <strong style="color:#15803d;">${formatearCLP(pagadoGrupo)}</strong> / Total Reserva: <strong>${formatearCLP(totalGrupo)}</strong>
+                                    ${g.ensalada ? ` · 🥗 <strong>Ensalada:</strong> ${g.ensalada}` : ''}
+                                </div>
+                            </div>
+
+                            <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+                                ${crearWhatsappLink(g.telefono, g.titular, g.codigoCupon)}
+                                ${pagan.length > 0 ? (
+                                    !completa
+                                        ? `<button class="btn btn-gold" style="padding:7px 12px; font-size:0.8rem;" onclick="marcarFamiliaCompleta('${g.groupId}', true)">
+                                            <i class="fa-solid fa-check-double"></i> Pagar Todo
+                                           </button>`
+                                        : `<button class="btn" style="padding:7px 12px; font-size:0.8rem;" onclick="marcarFamiliaCompleta('${g.groupId}', false)">
+                                            Desmarcar
+                                           </button>`
+                                ) : ''}
+                            </div>
+                        </div>
+
+                        <div class="pay-family-body">
+                            ${miembrosHTML}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function abrirFichaPersona(stableKey) {
+            selectedPersonKey = stableKey;
+            renderFichaPersona();
+            document.getElementById('personDrawerBackdrop').classList.add('open');
+        }
+
+        function cerrarFichaPersona(event) {
+            if (event && event.target !== document.getElementById('personDrawerBackdrop')) return;
+            selectedPersonKey = null;
+            document.getElementById('personDrawerBackdrop').classList.remove('open');
+        }
+
+        function renderFichaPersona() {
+            const p = personasUnificadas.find(item => item.stableKey === selectedPersonKey);
+            if (!p) return;
+
+            const grupo = gruposFamiliares.find(g => g.groupId === p.groupId);
+            const safeKey = p.stableKey.replace(/'/g, "\\'");
+            const ausente = esNoAsiste(p.stableKey);
+            const pagado = !!paymentMap[p.stableKey];
+            const enSalon = !!checkinMap[p.stableKey];
+
+            let estadoPagoHTML = '';
+            if (ausente) {
+                estadoPagoHTML = `<span class="badge badge-red">No asiste ($0)</span>`;
+            } else if (p.valor === 0) {
+                estadoPagoHTML = `<span class="badge badge-gold">Gratis (≤4 años)</span>`;
+            } else {
+                estadoPagoHTML = `
+                    <button type="button" class="pay-check-trigger ${pagado ? 'active' : ''}" onclick="togglePagoVerificado('${safeKey}')">
+                        <i class="fa-solid ${pagado ? 'fa-square-check' : 'fa-square'}"></i>
+                        ${pagado ? `Pagado ✓ (${formatearCLP(p.valor)})` : `Marcar Pagado (${formatearCLP(p.valor)})`}
+                    </button>
+                `;
+            }
+
+            const miembrosHTML = grupo ? grupo.miembros.map(m => {
+                const mAus = esNoAsiste(m.stableKey);
+                const mPag = !!paymentMap[m.stableKey];
+                const bText = mAus ? 'No asiste' : (m.valor === 0 ? 'Gratis' : (mPag ? 'Pagado ✓' : formatearCLP(m.valor)));
+                const bCls = mAus ? 'badge-red' : (m.valor === 0 ? 'badge-gold' : (mPag ? 'badge-green' : 'badge-amber'));
+                return `
+                    <div style="display:flex; justify-content:space-between; align-items:center; padding:8px 0; border-bottom:1px solid rgba(212,175,55,0.25); cursor:pointer;"
+                         onclick="abrirFichaPersona('${m.stableKey.replace(/'/g, "\\'")}')">
+                        <div>
+                            <div style="font-weight:800; font-size:0.88rem; color:var(--bordo-primary);">${m.nombre}</div>
+                            <div style="font-size:0.75rem; color:var(--text-muted);">${m.rol} · ${m.edad !== null ? m.edad + ' años' : 'Adulto'}</div>
+                        </div>
+                        <span class="badge ${bCls}">${bText}</span>
+                    </div>
+                `;
+            }).join('') : '';
+
+            document.getElementById('personDrawerContent').innerHTML = `
+                <div class="drawer-box">
+                    <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:10px;">
+                        <div>
+                            <h3 style="font-family:'Cormorant Garamond', serif; font-size:1.5rem; font-weight:700; color:var(--bordo-primary);">${p.nombre}</h3>
+                            <div style="font-size:0.84rem; color:var(--text-muted); font-weight:600; margin-top:2px;">
+                                ${p.rol} · ${p.edad !== null ? p.edad + ' años' : 'Tarifa General'} · Cupón <strong>${p.codigoCupon}</strong>
+                            </div>
+                        </div>
+                        <span class="badge badge-gold">${formatearCLP(p.valor)}</span>
+                    </div>
+
+                    <div style="margin-top:12px;">
+                        ${crearWhatsappLink(p.telefono, p.titularGrupo, p.codigoCupon)}
+                    </div>
+
+                    ${grupo && grupo.ensalada ? `
+                        <div style="margin-top:12px; padding:10px 12px; border-radius:12px; background:var(--cream-bg); border:1px solid var(--border-gold); font-size:0.84rem;">
+                            <strong>🥗 Ensalada comprometida:</strong> ${grupo.ensalada}
+                        </div>
+                    ` : ''}
+                </div>
+
+                <div class="drawer-box">
+                    <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">
+                        Control Rápido
+                    </div>
+
+                    <div class="drawer-toggle-row">
+                        <span style="font-weight:700; font-size:0.9rem; color:var(--bordo-primary);">Adhesión Cena</span>
+                        ${estadoPagoHTML}
+                    </div>
+
+                    ${!ausente ? `
+                        <div class="drawer-toggle-row">
+                            <span style="font-weight:700; font-size:0.9rem; color:var(--bordo-primary);">Ingreso al Salón</span>
+                            <button type="button" class="pay-check-trigger ${enSalon ? 'active' : ''}" onclick="toggleIngresoPuerta('${safeKey}')">
+                                <i class="fa-solid ${enSalon ? 'fa-champagne-glasses' : 'fa-clock'}"></i>
+                                ${enSalon ? 'En Salón ✓' : 'Marcar Ingreso'}
+                            </button>
+                        </div>
+                    ` : ''}
+
+                    <div class="drawer-toggle-row">
+                        <span style="font-weight:700; font-size:0.9rem; color:#991b1b;">¿No asistirá?</span>
+                        <button type="button" class="absent-check-trigger ${ausente ? 'active' : ''}" onclick="toggleNoAsiste('${safeKey}')">
+                            <i class="fa-solid ${ausente ? 'fa-check-square' : 'fa-square'}"></i>
+                            ${ausente ? 'Marcado No Asiste' : 'Marcar No Asiste'}
+                        </button>
+                    </div>
+                </div>
+
+                ${grupo && grupo.miembros.length > 1 ? `
+                    <div class="drawer-box">
+                        <div style="font-size:0.76rem; font-weight:800; text-transform:uppercase; color:var(--text-muted); margin-bottom:6px;">
+                            Integrantes de la Mesa (${grupo.miembros.length})
+                        </div>
+                        ${miembrosHTML}
+                    </div>
+                ` : ''}
+            `;
+        }
+
+        async function cargarDatos(silencioso = false) {
+            if (!SCRIPT_URL) {
+                setCloudSyncStatus('local', 'Pega URL de Apps Script');
+                if (!silencioso) {
+                    mostrarEstado('Conecta tu planilla pegando la URL de Google Apps Script en SCRIPT_URL para sincronizar en vivo.', false);
+                }
+                actualizarKPIs();
+                renderTabla();
+                return;
+            }
+
+            try {
+                if (!silencioso) mostrarEstado('Sincronizando reservas de la gala...', false);
+                setCloudSyncStatus('syncing', 'Sincronizando...');
+                const resp = await fetch(SCRIPT_URL);
+                if (!resp.ok) throw new Error('HTTP ' + resp.status);
+                const data = await resp.json();
+
+                const rows = Array.isArray(data) ? data : (data.inscripciones || []);
+                const estadosNube = (!Array.isArray(data) && data.estados) ? data.estados : null;
+
+                if (estadosNube) {
+                    Object.keys(estadosNube).forEach(key => {
+                        const est = estadosNube[key];
+                        if (est.pagado) paymentMap[key] = true;
+                        else delete paymentMap[key];
+
+                        if (est.ingreso) checkinMap[key] = true;
+                        else delete checkinMap[key];
+
+                        if (est.noAsiste) noAttendMap[key] = true;
+                        else delete noAttendMap[key];
+                    });
+                    try {
+                        localStorage.setItem(PAYMENT_STORAGE_KEY, JSON.stringify(paymentMap));
+                        localStorage.setItem(CHECKIN_STORAGE_KEY, JSON.stringify(checkinMap));
+                        localStorage.setItem(NO_ATTEND_STORAGE_KEY, JSON.stringify(noAttendMap));
+                    } catch (e) {}
+                }
+
+                personasUnificadas = [];
+                gruposFamiliares = [];
+
+                rows.forEach((row, idx) => {
+                    const nombreTitular = String(row.nombre || '').trim();
+                    if (!nombreTitular) return;
+
+                    const codigoCupon = row.codigoCupon || `AG-${1000 + idx}`;
+                    const fechaStr = row.fecha ? new Date(row.fecha).toLocaleDateString('es-CL') : '-';
+                    const telefono = row.telefono || '';
+                    const ensalada = String(row.mensaje || '').trim();
+                    const groupId = `mesa_${idx}_${codigoCupon}`;
+
+                    const miembrosGrupo = [];
+
+                    const objTitular = {
+                        stableKey: `${codigoCupon}_Titular_${idx}`,
+                        groupId: groupId,
+                        codigoCupon: codigoCupon,
+                        nombre: nombreTitular,
+                        edad: null,
+                        valor: VALOR_ADULTO,
+                        rol: 'Titular',
+                        titularGrupo: nombreTitular,
+                        telefono: telefono,
+                        ensalada: ensalada,
+                        fecha: fechaStr
+                    };
+                    personasUnificadas.push(objTitular);
+                    miembrosGrupo.push(objTitular);
+
+                    const listaAcomp = parsearAcompanantesCena(row.acompanantes);
+                    listaAcomp.forEach((ac, aIdx) => {
+                        const val = calcularTarifaPorEdad(ac.edad);
+                        const objAcomp = {
+                            stableKey: `${codigoCupon}_Acomp_${aIdx}_${ac.nombre}`,
+                            groupId: groupId,
+                            codigoCupon: codigoCupon,
+                            nombre: ac.nombre,
+                            edad: ac.edad,
+                            valor: val,
+                            rol: 'Acompañante',
+                            titularGrupo: nombreTitular,
+                            telefono: telefono,
+                            ensalada: ensalada,
+                            fecha: fechaStr
+                        };
+                        personasUnificadas.push(objAcomp);
+                        miembrosGrupo.push(objAcomp);
+                    });
+
+                    gruposFamiliares.push({
+                        groupId: groupId,
+                        codigoCupon: codigoCupon,
+                        titular: nombreTitular,
+                        telefono: telefono,
+                        ensalada: ensalada,
+                        fecha: fechaStr,
+                        miembros: miembrosGrupo
+                    });
+                });
+
+                actualizarKPIs();
+                renderTabla();
+                renderVistaRecepcion();
+                renderVistaPagos();
+                if (selectedPersonKey) renderFichaPersona();
+                setCloudSyncStatus('ok', 'Nube sincronizada ✓');
+                if (!silencioso) mostrarEstado(`Sincronizado: ${personasUnificadas.length} invitados en ${gruposFamiliares.length} mesas.`, false);
+            } catch (err) {
+                setCloudSyncStatus('local', 'Modo local');
+                if (!silencioso) mostrarEstado('Error al conectar con Google Sheets.', true);
+            }
+        }
+
+        function actualizarKPIs() {
+            const activos = personasUnificadas.filter(p => !esNoAsiste(p.stableKey));
+            const total = activos.length;
+
+            const adultos = activos.filter(p => p.valor === VALOR_ADULTO).length;
+            const ninosPago = activos.filter(p => p.valor === VALOR_NINO).length;
+            const ninosGratis = activos.filter(p => p.valor === 0).length;
+            const totalNinos = ninosPago + ninosGratis;
+
+            let esperado = 0;
+            let recaudado = 0;
+            activos.forEach(p => {
+                esperado += p.valor;
+                if (p.valor > 0 && paymentMap[p.stableKey]) recaudado += p.valor;
+            });
+
+            const gruposConEnsalada = gruposFamiliares.filter(g => g.ensalada && g.ensalada.length > 0).length;
+            const gruposSinEnsalada = Math.max(0, gruposFamiliares.length - gruposConEnsalada);
+            const personasConEnsalada = activos.filter(p => p.ensalada && p.ensalada.length > 0).length;
+            const ingresados = activos.filter(p => checkinMap[p.stableKey]).length;
+            const pendientesPagoCount = activos.filter(p => p.valor > 0 && !paymentMap[p.stableKey]).length;
+
+            // Actualizar contadores en las píldoras de filtro rápido
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = `(${val})`; };
+            setTxt('pillCountAll', total);
+            setTxt('pillCountAdultos', adultos);
+            setTxt('pillCountPendientes', pendientesPagoCount);
+            setTxt('pillCountNinos', totalNinos);
+            setTxt('pillCountEnsalada', personasConEnsalada);
+            setTxt('pillCountSalon', ingresados);
+
+            const resumenCountEl = document.getElementById('tablaResumenCount');
+            if (resumenCountEl) {
+                resumenCountEl.innerText = `${total} invitado(s) en ${gruposFamiliares.length} mesa(s)`;
+            }
+
+            // Actualizar resumen en la vista de Balance y Gráficos
+            const balAsist = document.getElementById('balTotalAsistentes');
+            if (balAsist) {
+                balAsist.innerText = total;
+                document.getElementById('balTotalRecaudado').innerText = formatearCLP(recaudado);
+                document.getElementById('balTotalPendiente').innerText = formatearCLP(Math.max(0, esperado - recaudado));
+                document.getElementById('balTotalEnsaladas').innerText = `${gruposConEnsalada} de ${gruposFamiliares.length}`;
+            }
+
+            const pagadosCount = activos.filter(p => p.valor > 0 && paymentMap[p.stableKey]).length;
+
+            renderCharts(adultos, ninosPago, ninosGratis, pagadosCount, pendientesPagoCount, gruposConEnsalada, gruposSinEnsalada);
+        }
+
+        function filtrarDesdeGrafico(filtro) {
+            cerrarSubVistas();
+            toggleListaInvitados(true);
+            setQuickFilter(filtro);
+            const tablaEl = document.getElementById('tablaSection');
+            if (tablaEl) {
+                tablaEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+
+        function toggleListaInvitados(forzarAbrir = null) {
+            const body = document.getElementById('tablaCollapsibleBody');
+            const btn = document.getElementById('btnToggleLista');
+            if (!body || !btn) return;
+
+            const estaCerrada = body.style.display === 'none';
+            const abrir = forzarAbrir !== null ? forzarAbrir : estaCerrada;
+
+            if (abrir) {
+                body.style.display = 'block';
+                btn.innerHTML = `<i class="fa-solid fa-chevron-up"></i> Ocultar Lista`;
+            } else {
+                body.style.display = 'none';
+                btn.innerHTML = `<i class="fa-solid fa-chevron-down"></i> Mostrar Lista`;
+            }
+        }
+
+        function renderCharts(adultos, ninosPago, ninosGratis, pagados, pendientes, conEnsalada, sinEnsalada) {
+            const commonOpts = {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: { font: { family: 'Plus Jakarta Sans', weight: '700', size: 11 }, color: '#2a0810' }
+                    }
+                }
+            };
+
+            if (chartTramosInst) chartTramosInst.destroy();
+            chartTramosInst = new Chart(document.getElementById('chartTramos'), {
+                type: 'doughnut',
+                data: {
+                    labels: [`General $5.000 (${adultos})`, `Niños $3.000 (${ninosPago})`, `Gratis ≤4a (${ninosGratis})`],
+                    datasets: [{
+                        data: [adultos, ninosPago, ninosGratis],
+                        backgroundColor: ['#5e0b1f', '#d4af37', '#f3e5ab'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    ...commonOpts,
+                    onClick: (e, els) => {
+                        if (els.length) filtrarDesdeGrafico(els[0].index === 0 ? 'all' : 'ninos');
+                    }
+                }
+            });
+
+            if (chartPagosInst) chartPagosInst.destroy();
+            chartPagosInst = new Chart(document.getElementById('chartPagos'), {
+                type: 'doughnut',
+                data: {
+                    labels: [`Pagados (${pagados})`, `Pendientes (${pendientes})`],
+                    datasets: [{
+                        data: [pagados, pendientes],
+                        backgroundColor: ['#15803d', '#d97706'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    ...commonOpts,
+                    onClick: (e, els) => {
+                        if (els.length) filtrarDesdeGrafico(els[0].index === 1 ? 'pendiente_pago' : 'all');
+                    }
+                }
+            });
+
+            if (chartEnsaladasInst) chartEnsaladasInst.destroy();
+            chartEnsaladasInst = new Chart(document.getElementById('chartEnsaladas'), {
+                type: 'doughnut',
+                data: {
+                    labels: [`Con Ensalada (${conEnsalada})`, `Sin definir (${sinEnsalada})`],
+                    datasets: [{
+                        data: [conEnsalada, sinEnsalada],
+                        backgroundColor: ['#7a122b', '#cbd5e1'],
+                        borderWidth: 2,
+                        borderColor: '#ffffff'
+                    }]
+                },
+                options: {
+                    ...commonOpts,
+                    onClick: (e, els) => {
+                        if (els.length) filtrarDesdeGrafico(els[0].index === 0 ? 'con_ensalada' : 'all');
+                    }
+                }
+            });
+        }
+
+        function setQuickFilter(filtro) {
+            quickFilterActual = filtro;
+            document.querySelectorAll('#quickFilterPills .filter-pill').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-filter') === filtro);
+            });
+            renderTabla();
+        }
+
+        function cambiarVistaTabla(vista) {
+            vistaTablaActual = vista;
+            document.getElementById('tabUnificado').classList.toggle('active', vista === 'unificado');
+            document.getElementById('tabFamilias').classList.toggle('active', vista === 'familias');
+            renderTabla();
+        }
+
+        function renderTabla() {
+            const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+            const thead = document.getElementById('tablaHead');
+            const tbody = document.getElementById('tablaBody');
+
+            if (vistaTablaActual === 'unificado') {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Cupón</th>
+                        <th>Invitado</th>
+                        <th>Tramo / Edad</th>
+                        <th>Estado Pago</th>
+                        <th>Mesa / Titular</th>
+                        <th>Ensalada</th>
+                        <th>WhatsApp</th>
+                    </tr>
+                `;
+
+                const filtrados = personasUnificadas.filter(p => {
+                    const match = p.nombre.toLowerCase().includes(query) ||
+                        p.titularGrupo.toLowerCase().includes(query) ||
+                        p.codigoCupon.toLowerCase().includes(query) ||
+                        (p.ensalada && p.ensalada.toLowerCase().includes(query));
+                    if (!match) return false;
+
+                    const aus = esNoAsiste(p.stableKey);
+                    if (quickFilterActual === 'adultos') return !aus && p.valor === VALOR_ADULTO;
+                    if (quickFilterActual === 'pendiente_pago') return !aus && p.valor > 0 && !paymentMap[p.stableKey];
+                    if (quickFilterActual === 'ninos') return !aus && p.valor < VALOR_ADULTO;
+                    if (quickFilterActual === 'con_ensalada') return !aus && p.ensalada && p.ensalada.length > 0;
+                    if (quickFilterActual === 'ingresados') return !aus && !!checkinMap[p.stableKey];
+                    return true;
+                });
+
+                if (!filtrados.length) {
+                    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding:24px; color:var(--text-muted); font-weight:600;">No se encontraron invitados.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filtrados.map(p => {
+                    const edadTxt = p.edad !== null ? `${p.edad} años` : 'General (13+)';
+                    const aus = esNoAsiste(p.stableKey);
+                    let pagoBadge = '';
+                    if (aus) pagoBadge = `<span class="badge badge-red">No asiste</span>`;
+                    else if (p.valor === 0) pagoBadge = `<span class="badge badge-gold">Gratis (≤4a)</span>`;
+                    else if (paymentMap[p.stableKey]) pagoBadge = `<span class="badge badge-green">Pagado ✓ (${formatearCLP(p.valor)})</span>`;
+                    else pagoBadge = `<span class="badge badge-amber">Pendiente (${formatearCLP(p.valor)})</span>`;
+
+                    return `
+                        <tr class="clickable-row" onclick="abrirFichaPersona('${p.stableKey.replace(/'/g, "\\'")}')">
+                            <td><span class="badge badge-bordo">${p.codigoCupon}</span></td>
+                            <td style="font-weight:800; color:var(--bordo-primary);">${p.nombre}</td>
+                            <td style="font-weight:700;">${edadTxt}</td>
+                            <td>${pagoBadge}</td>
+                            <td>${p.rol === 'Titular' ? '<span class="badge badge-gold">Titular</span>' : `Mesa <strong>${p.titularGrupo}</strong>`}</td>
+                            <td style="font-size:0.84rem; max-width:200px;">${p.ensalada ? `🥗 ${p.ensalada}` : '<span style="color:#94a3b8;">-</span>'}</td>
+                            <td>${crearWhatsappLink(p.telefono, p.titularGrupo, p.codigoCupon)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            } else {
+                thead.innerHTML = `
+                    <tr>
+                        <th>Cupón</th>
+                        <th>Titular Mesa</th>
+                        <th>Invitados</th>
+                        <th>Cobro Mesa</th>
+                        <th>Ensalada Comprometida</th>
+                        <th>WhatsApp</th>
+                    </tr>
+                `;
+
+                const filtradas = gruposFamiliares.filter(g =>
+                    g.titular.toLowerCase().includes(query) ||
+                    g.codigoCupon.toLowerCase().includes(query) ||
+                    (g.ensalada && g.ensalada.toLowerCase().includes(query)) ||
+                    g.miembros.some(m => m.nombre.toLowerCase().includes(query))
+                );
+
+                if (!filtradas.length) {
+                    tbody.innerHTML = `<tr><td colspan="6" style="text-align:center; padding:24px; color:var(--text-muted); font-weight:600;">No se encontraron mesas.</td></tr>`;
+                    return;
+                }
+
+                tbody.innerHTML = filtradas.map(g => {
+                    const activos = g.miembros.filter(m => !esNoAsiste(m.stableKey));
+                    const totalMesa = activos.reduce((s, m) => s + m.valor, 0);
+                    const pagadoMesa = activos.filter(m => m.valor > 0 && paymentMap[m.stableKey]).reduce((s, m) => s + m.valor, 0);
+
+                    const nombresHtml = g.miembros.map(m => {
+                        const e = m.edad !== null ? ` (${m.edad}a)` : '';
+                        const check = m.valor > 0 && paymentMap[m.stableKey] ? ' ✓' : '';
+                        return `<div style="font-size:0.84rem;">• <strong>${m.nombre}</strong>${e} — ${formatearCLP(m.valor)}${check}</div>`;
+                    }).join('');
+
+                    return `
+                        <tr class="clickable-row" onclick="abrirFichaPersona('${g.miembros[0].stableKey.replace(/'/g, "\\'")}')">
+                            <td><span class="badge badge-bordo">${g.codigoCupon}</span></td>
+                            <td style="font-weight:800; color:var(--bordo-primary);">${g.titular}</td>
+                            <td>${nombresHtml}</td>
+                            <td>
+                                <span class="badge ${pagadoMesa === totalMesa ? 'badge-green' : 'badge-amber'}">
+                                    ${formatearCLP(pagadoMesa)} / ${formatearCLP(totalMesa)}
+                                </span>
+                            </td>
+                            <td style="font-size:0.86rem; font-weight:600;">${g.ensalada ? `🥗 ${g.ensalada}` : '-'}</td>
+                            <td>${crearWhatsappLink(g.telefono, g.titular, g.codigoCupon)}</td>
+                        </tr>
+                    `;
+                }).join('');
+            }
+        }
+
+        function exportarExcel() {
+            if (!personasUnificadas.length) {
+                mostrarEstado('No hay datos cargados para exportar.', true);
+                return;
+            }
+
+            const datos = personasUnificadas.map(p => {
+                const aus = esNoAsiste(p.stableKey);
+                let estadoPago = 'Pendiente';
+                if (aus) estadoPago = 'No Asiste';
+                else if (p.valor === 0) estadoPago = 'Gratis (≤4 años)';
+                else if (paymentMap[p.stableKey]) estadoPago = 'Pagado';
+
+                return {
+                    'Cupón': p.codigoCupon,
+                    'Nombre Invitado': p.nombre,
+                    'Edad': p.edad !== null ? p.edad : '13+ años',
+                    'Valor (CLP)': aus ? 0 : p.valor,
+                    'Estado Pago': estadoPago,
+                    'Rol': p.rol,
+                    'Titular Mesa': p.titularGrupo,
+                    'En Salón': checkinMap[p.stableKey] ? 'Sí' : 'No',
+                    'Ensalada': p.ensalada,
+                    'WhatsApp': p.telefono
+                };
+            });
+
+            const ws = XLSX.utils.json_to_sheet(datos);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, 'Cena Accion de Gracias');
+            XLSX.writeFile(wb, 'Cena_Accion_de_Gracias_2026.xlsx');
+        }
+
+        cargarDatos(false);
+        setInterval(() => cargarDatos(true), 15000);
+    </script>
+</body>
+</html>
